@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "JYwZGJ8zglULl7qFzQza9mUVetLDEB8pjLB5XF4szMSEMWOXTMQKrRU7Km/XQ4B04KlE0h9nW8pMZXc0h5yRdA==",
+  "success": true,
+  "projectFilePath": "/Users/hndgy/main_repo/cours/M2_MIAGE/S4/interoperabilite/projet/projet/utilisateur-service/utilisateur-service.csproj",
+  "expectedPackageFiles": [
+    "/Users/hndgy/.nuget/packages/microsoft.extensions.apidescription.server/3.0.0/microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
+    "/Users/hndgy/.nuget/packages/microsoft.openapi/1.2.3/microsoft.openapi.1.2.3.nupkg.sha512",
+    "/Users/hndgy/.nuget/packages/swashbuckle.aspnetcore/6.2.3/swashbuckle.aspnetcore.6.2.3.nupkg.sha512",
+    "/Users/hndgy/.nuget/packages/swashbuckle.aspnetcore.swagger/6.2.3/swashbuckle.aspnetcore.swagger.6.2.3.nupkg.sha512",
+    "/Users/hndgy/.nuget/packages/swashbuckle.aspnetcore.swaggergen/6.2.3/swashbuckle.aspnetcore.swaggergen.6.2.3.nupkg.sha512",
+    "/Users/hndgy/.nuget/packages/swashbuckle.aspnetcore.swaggerui/6.2.3/swashbuckle.aspnetcore.swaggerui.6.2.3.nupkg.sha512"
+  ],
+  "logs": []
+}
