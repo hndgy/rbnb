@@ -1,0 +1,13 @@
+package fr.orleans.univ.miage.interop.transactionservice;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class TransactionServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(TransactionServiceApplication.class, args);
+	}
+
+}
