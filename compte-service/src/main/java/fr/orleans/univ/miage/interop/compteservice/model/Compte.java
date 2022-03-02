@@ -1,12 +1,11 @@
 package fr.orleans.univ.miage.interop.compteservice.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
+@Data
+@Builder
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,7 +15,7 @@ import javax.persistence.*;
 public class Compte {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_compte", nullable = false)
     private Long idCompte;
 
@@ -26,6 +25,7 @@ public class Compte {
     @Column(name = "libelle")
     private String libelleCompte;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private String typeCompte;
 
