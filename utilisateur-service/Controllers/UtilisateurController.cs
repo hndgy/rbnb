@@ -1,6 +1,7 @@
 using Keycloak.Net;
 using Microsoft.AspNetCore.Mvc;
 using utilisateur_service.Entities;
+using utilisateur_service.Models;
 
 namespace utilisateur_service.Controllers;
 
@@ -10,7 +11,7 @@ public class UtilisateurController : ControllerBase
 {
     private readonly ILogger<UtilisateurController> _logger;
     private readonly KeycloakClient _keycloakClient;
-    private List<Utilisateur> _list;
+    private UserServiceDbContext dbContext;
 
     public UtilisateurController(ILogger<UtilisateurController> logger)
     {
@@ -20,13 +21,13 @@ public class UtilisateurController : ControllerBase
             userName: "admin",
             password: "admin"
         );
-        _list = new List<Utilisateur>();
+        //instancier dbContext
     }
 
     [HttpGet(Name = "GetAllUser")]
     public IEnumerable<Utilisateur> Get()
     {
-        return _list;
+        return dbContext.Utilisateurs.AsEnumerable();
     }
 
     [HttpPost()]
@@ -47,7 +48,7 @@ public class UtilisateurController : ControllerBase
         if (res != null)
         {
             utilisateur.Id = res;
-            _list.Add(utilisateur);
+            dbContext.Utilisateurs.Add(utilisateur);
             return utilisateur;
 
 
