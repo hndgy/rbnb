@@ -14,8 +14,8 @@ import javax.persistence.*;
 @Table(name = "compte")
 public class Compte {
 
-    public Compte(String idUser, String libelleCompte, String typeCompte) {
-        this.idUser = idUser;
+    public Compte(String idOwner, String libelleCompte, String typeCompte) {
+        this.idOwner = idOwner;
         this.libelleCompte = libelleCompte;
         this.typeCompte = typeCompte;
     }
@@ -25,13 +25,13 @@ public class Compte {
     @Column(name = "id_compte", nullable = false)
     private Long idCompte;
 
-    @Column(name = "id_user", nullable = false)
-    private String idUser;
+    @Column(name = "id_owner", nullable = false)
+    private String idOwner;
 
     @Column(name = "libelle")
     private String libelleCompte;
 
-    @Enumerated(EnumType.STRING)
+    //@Enumerated(EnumType.STRING) TODO : Enum
     @Column(name = "type")
     private String typeCompte;
 

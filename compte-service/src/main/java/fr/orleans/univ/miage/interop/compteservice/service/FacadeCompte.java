@@ -11,12 +11,12 @@ public interface FacadeCompte {
 
     Compte findCompteByIdCompte(Long idCompte) throws CompteIntrouvableException;
 
-    Collection<Compte> findComptesByIdUser(String idUser) throws CompteIntrouvableException;
+    Collection<Compte> findComptesByIdOwner(String idUser) throws CompteIntrouvableException;
 
     Compte updateCompte(Compte compte) throws CompteIntrouvableException;
 
     void deleteCompteByIdCompte(Long idCompte) throws CompteIntrouvableException;
 
-    void deleteComptesByIdUser(String idUser) throws CompteIntrouvableException;
+    void deleteComptesByIdOwner(String idUser) throws CompteIntrouvableException;
 
 }

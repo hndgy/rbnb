@@ -29,10 +29,10 @@ public class FacadeCompteImpl implements FacadeCompte{
 
 
     @Override
-    public Collection<Compte> findComptesByIdUser(String idUser) throws CompteIntrouvableException {
-        Collection<Compte> compte1 = compteRepository.findComptesByIdUser(idUser);
+    public Collection<Compte> findComptesByIdOwner(String idUser) throws CompteIntrouvableException {
+        Collection<Compte> compte1 = compteRepository.findComptesByIdOwner(idUser);
         if (!compte1.isEmpty()){
-            return compteRepository.findComptesByIdUser(idUser);
+            return compteRepository.findComptesByIdOwner(idUser);
         }
         throw new CompteIntrouvableException();
     }
@@ -41,10 +41,8 @@ public class FacadeCompteImpl implements FacadeCompte{
     public Compte updateCompte(Compte compte) throws CompteIntrouvableException {
         Optional<Compte> compte1 = compteRepository.findById(compte.getIdCompte());
         if (compte1.isPresent()){
-            compte1.get().setIdCompte(compte.getIdCompte());
             compte1.get().setTypeCompte(compte.getTypeCompte());
             compte1.get().setLibelleCompte(compte.getLibelleCompte());
-
             return (compteRepository.save(compte1.get()));
         }
         throw new CompteIntrouvableException();
@@ -60,10 +58,10 @@ public class FacadeCompteImpl implements FacadeCompte{
     }
 
     @Override
-    public void deleteComptesByIdUser(String idUser) throws CompteIntrouvableException {
-        Collection<Compte> compte1 = compteRepository.findComptesByIdUser(idUser);
+    public void deleteComptesByIdOwner(String idUser) throws CompteIntrouvableException {
+        Collection<Compte> compte1 = compteRepository.findComptesByIdOwner(idUser);
         if (!compte1.isEmpty()){
-            compteRepository.deleteComptesByIdUser(idUser);
+            compteRepository.deleteComptesByIdOwner(idUser);
         }
         throw new CompteIntrouvableException();
     }

@@ -9,9 +9,9 @@ import java.util.Collection;
 @Repository
 public interface CompteRepository extends JpaRepository<Compte,Long> {
 
-    Compte findCompteByIdCompte(Long IdCompte);
-    Collection<Compte> findComptesByIdUser(String IdUser);
+    Compte findCompteByIdCompte(Long idCompte);
+    Collection<Compte> findComptesByIdOwner(String idOwner);
 
-    Compte deleteCompteByIdCompte(Long IdCompte);
-    Collection<Compte> deleteComptesByIdUser(String IdUser);
+    Compte deleteCompteByIdCompte(Long idCompte);
+    Collection<Compte> deleteComptesByIdOwner(String idOwner);
 }
