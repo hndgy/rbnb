@@ -21,34 +21,36 @@ public class UtilisateurController : ControllerBase
             userName: "admin",
             password: "admin"
         );
-        //instancier dbContext
+
+        dbContext = new UserServiceDbContext();
     }
 
     [HttpGet(Name = "GetAllUser")]
     public IEnumerable<Utilisateur> Get()
     {
+        //return new List<Utilisateur>();
         return dbContext.Utilisateurs.AsEnumerable();
     }
 
     [HttpPost()]
     public Utilisateur Inscrire(Utilisateur utilisateur)
     {
-        var created = _keycloakClient.CreateAndRetrieveUserIdAsync(
-            realm: "test",
-            user: new Keycloak.Net.Models.Users.User()
-            {
-                UserName = utilisateur.Nom,
-                LastName = utilisateur.Nom,
-                FirstName = utilisateur.Prenom,
-                Email = utilisateur.Mail
-            }
-        );
-        created.Wait();
-        var res = created.Result;
-        if (res != null)
+        /*var created = _keycloakClient.CreateAndRetrieveUserIdAsync(
+        realm: "master",
+        user: new Keycloak.Net.Models.Users.User()
         {
-            utilisateur.Id = res;
+            UserName = utilisateur.Nom,
+            LastName = utilisateur.Nom,
+            FirstName = utilisateur.Prenom,
+            Email = utilisateur.Mail
+        });
+        created.Wait();
+        var res = created.Result;*/
+        if (true)
+        {
+            utilisateur.Id = Guid.NewGuid().ToString();
             dbContext.Utilisateurs.Add(utilisateur);
+            dbContext.SaveChanges();
             return utilisateur;
 
 
@@ -56,5 +58,41 @@ public class UtilisateurController : ControllerBase
         return null;
     }
 
+    [HttpGet]
+    [Route("{id}")]
+    public IActionResult GetById([FromRoute] String id)
+    {
+
+        var user = dbContext.Utilisateurs.Where(u => u.Id == id).FirstOrDefault();
+        if (user == null)
+        {
+            return NotFound();
+        }
+        return Ok(user);
+    }
+
+    [HttpGet]
+    [Route("test")]
+    public IActionResult Test()
+    {
+
+        var resp = _keycloakClient.CreateInitialAccessTokenAsync(
+            "master",
+            new Keycloak.Net.Models.ClientInitialAccess.ClientInitialAccessCreatePresentation()
+            );
+        resp.Wait();
+
+        /* var created = _keycloakClient.CreateAndRetrieveUserIdAsync(
+         realm: "master",
+         user: new Keycloak.Net.Models.Users.User()
+         {
+             UserName = Guid.NewGuid().ToString(),
+             LastName = "test",
+             FirstName = "test",
+             Email = "test@tes.fr"
+         });
+         created.Wait();$*/
+        return Ok(resp.Result);
+    }
 
 }
