@@ -9,14 +9,14 @@ public interface FacadeCompte {
 
     Compte saveCompte(Compte compte);
 
-    Compte findCompteByIdCompte(Long idCompte);
+    Compte findCompteByIdCompte(Long idCompte) throws CompteIntrouvableException;
 
-    Collection<Compte> findComptesByIdUser(String idUser);
+    Collection<Compte> findComptesByIdUser(String idUser) throws CompteIntrouvableException;
 
     Compte updateCompte(Compte compte) throws CompteIntrouvableException;
 
-    void deleteCompteByIdCompte(Long idCompte);
+    void deleteCompteByIdCompte(Long idCompte) throws CompteIntrouvableException;
 
-    void deleteComptesByIdUser(String idUser);
+    void deleteComptesByIdUser(String idUser) throws CompteIntrouvableException;
 
 }

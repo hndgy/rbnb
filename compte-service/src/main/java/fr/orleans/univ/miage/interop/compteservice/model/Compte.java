@@ -14,6 +14,12 @@ import javax.persistence.*;
 @Table(name = "compte")
 public class Compte {
 
+    public Compte(String idUser, String libelleCompte, String typeCompte) {
+        this.idUser = idUser;
+        this.libelleCompte = libelleCompte;
+        this.typeCompte = typeCompte;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_compte", nullable = false)

@@ -19,14 +19,22 @@ public class FacadeCompteImpl implements FacadeCompte{
     }
 
     @Override
-    public Compte findCompteByIdCompte(Long idCompte) {
-        return compteRepository.findCompteByIdCompte(idCompte);
+    public Compte findCompteByIdCompte(Long idCompte) throws CompteIntrouvableException {
+        Optional<Compte> compte1 = compteRepository.findById(idCompte);
+        if (compte1.isPresent()){
+            return compteRepository.findCompteByIdCompte(idCompte);
+        }
+        throw new CompteIntrouvableException();
     }
 
 
     @Override
-    public Collection<Compte> findComptesByIdUser(String idUser) {
-        return compteRepository.findComptesByIdUser(idUser);
+    public Collection<Compte> findComptesByIdUser(String idUser) throws CompteIntrouvableException {
+        Collection<Compte> compte1 = compteRepository.findComptesByIdUser(idUser);
+        if (!compte1.isEmpty()){
+            return compteRepository.findComptesByIdUser(idUser);
+        }
+        throw new CompteIntrouvableException();
     }
 
     @Override
@@ -43,12 +51,21 @@ public class FacadeCompteImpl implements FacadeCompte{
     }
 
     @Override
-    public void deleteCompteByIdCompte(Long idCompte) {
-        compteRepository.deleteCompteByIdCompte(idCompte);
+    public void deleteCompteByIdCompte(Long idCompte) throws CompteIntrouvableException {
+        Optional<Compte> compte1 = compteRepository.findById(idCompte);
+        if (compte1.isPresent()){
+            compteRepository.deleteCompteByIdCompte(idCompte);
+        }
+        throw new CompteIntrouvableException();
     }
 
     @Override
-    public void deleteComptesByIdUser(String idUser) {
-        compteRepository.deleteComptesByIdUser(idUser);
+    public void deleteComptesByIdUser(String idUser) throws CompteIntrouvableException {
+        Collection<Compte> compte1 = compteRepository.findComptesByIdUser(idUser);
+        if (!compte1.isEmpty()){
+            compteRepository.deleteComptesByIdUser(idUser);
+        }
+        throw new CompteIntrouvableException();
     }
+
 }
