@@ -34,7 +34,7 @@ client.test("Request executed successfully", function() {
 %}
 ###
 
-GET localhost:8084/account/{{idUser}}/compte
+GET localhost:8084/account/{{idOwner}}/compte
 
 > {%
 client.test("Request executed successfully", function() {
@@ -51,7 +51,7 @@ client.test("Request executed successfully", function() {
 });
 %}
 ###
-DELETE localhost:8084/account/{{idUser}}/compte
+DELETE localhost:8084/account/{{idOwner}}/compte
 
 > {%
 client.test("Request executed successfully", function() {

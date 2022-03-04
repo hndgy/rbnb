@@ -1,12 +1,15 @@
 package fr.orleans.univ.miage.interop.compteservice.controller;
 
 import fr.orleans.univ.miage.interop.compteservice.model.Compte;
+import fr.orleans.univ.miage.interop.compteservice.repository.CompteRepository;
 import fr.orleans.univ.miage.interop.compteservice.service.Exception.CompteIntrouvableException;
 import fr.orleans.univ.miage.interop.compteservice.service.FacadeCompte;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import javax.transaction.Transactional;
 import java.net.URI;
 import java.util.Collection;
 
@@ -70,6 +73,7 @@ public class CompteController {
         }
     }
 
+    @Transactional
     @DeleteMapping(value = "/compte/{idCompte}")
     public ResponseEntity<Object> deleteCompte (@PathVariable Long idCompte) {
         try {
