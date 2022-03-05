@@ -1,5 +1,7 @@
-using Keycloak.Net;
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using utilisateur_service.Dtos;
 using utilisateur_service.Entities;
 using utilisateur_service.Models;
 
@@ -9,20 +11,22 @@ namespace utilisateur_service.Controllers;
 [Route("[controller]")]
 public class UtilisateurController : ControllerBase
 {
+    private KeycloakClient _keycloakClient;
     private readonly ILogger<UtilisateurController> _logger;
-    private readonly KeycloakClient _keycloakClient;
+    private HttpClient _httpClient;
     private UserServiceDbContext dbContext;
 
     public UtilisateurController(ILogger<UtilisateurController> logger)
     {
         _logger = logger;
         _keycloakClient = new KeycloakClient(
-            url: "http://localhost:8080",
-            userName: "admin",
-            password: "admin"
+            host: "http://localhost:8080",
+            realm: "test"
         );
 
         dbContext = new UserServiceDbContext();
+
+        _httpClient = new HttpClient();
     }
 
     [HttpGet(Name = "GetAllUser")]
@@ -33,27 +37,21 @@ public class UtilisateurController : ControllerBase
     }
 
     [HttpPost()]
-    public Utilisateur Inscrire(Utilisateur utilisateur)
+    public async Task<IActionResult> Inscrire(CreationUtilisateurDto dto)
     {
-        /*var created = _keycloakClient.CreateAndRetrieveUserIdAsync(
-        realm: "master",
-        user: new Keycloak.Net.Models.Users.User()
+        if (!dto.CheckPassword())
         {
-            UserName = utilisateur.Nom,
-            LastName = utilisateur.Nom,
-            FirstName = utilisateur.Prenom,
-            Email = utilisateur.Mail
-        });
-        created.Wait();
-        var res = created.Result;*/
-        if (true)
+            return BadRequest("Les mots de passe ne sont pas les mêmes");
+        }
+        var idCreated = await _keycloakClient.CreateUser(dto);
+
+        if (idCreated != null)
         {
-            utilisateur.Id = Guid.NewGuid().ToString();
+            Utilisateur utilisateur = Mapper.ConvertCreationUtilisateurDtoToUtilisateur(dto);
+            utilisateur.Id = idCreated;
             dbContext.Utilisateurs.Add(utilisateur);
             dbContext.SaveChanges();
-            return utilisateur;
-
-
+            return Ok(utilisateur);
         }
         return null;
     }
@@ -73,26 +71,16 @@ public class UtilisateurController : ControllerBase
 
     [HttpGet]
     [Route("test")]
-    public IActionResult Test()
+    public async Task<IActionResult> GetToken()
     {
+        var token = await _keycloakClient.GetTokenAsync("admin-cli", "admin", "admin");
 
-        var resp = _keycloakClient.CreateInitialAccessTokenAsync(
-            "master",
-            new Keycloak.Net.Models.ClientInitialAccess.ClientInitialAccessCreatePresentation()
-            );
-        resp.Wait();
-
-        /* var created = _keycloakClient.CreateAndRetrieveUserIdAsync(
-         realm: "master",
-         user: new Keycloak.Net.Models.Users.User()
-         {
-             UserName = Guid.NewGuid().ToString(),
-             LastName = "test",
-             FirstName = "test",
-             Email = "test@tes.fr"
-         });
-         created.Wait();$*/
-        return Ok(resp.Result);
+        return Ok(token);
     }
 
+
+
+
 }
+
+
