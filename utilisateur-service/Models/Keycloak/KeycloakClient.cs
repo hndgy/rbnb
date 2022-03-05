@@ -66,7 +66,7 @@ public class KeycloakClient
         return response.Result.IsSuccessStatusCode;
     }
 
-    private async Task<string> CreateUserAsync(CreationUtilisateurDto dto, string adminToken)
+    private async Task<CreationUtilisateurKeycloakResponse> CreateUserAsync(CreationUtilisateurDto dto, string adminToken)
     {
         _httpClient.DefaultRequestHeaders.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -93,20 +93,33 @@ public class KeycloakClient
             content
         );
         response.Wait();
-        Console.WriteLine(response.Result.IsSuccessStatusCode);
-        return Guid.NewGuid().ToString();
-        var userId = response.Result.Headers.Location.AbsolutePath.Split("/")[-1];
+        Console.WriteLine(response.Result.Content.ReadAsStringAsync());
+        var creationUtilisateurKeycloakResponse = new CreationUtilisateurKeycloakResponse();
+        var locationHeader = response.Result.Headers.Location;
 
-        return userId;
+        if (response.Result.IsSuccessStatusCode && locationHeader != null)
+        {
+            var locationSplit = locationHeader.AbsolutePath.Split("/");
+            var userId = locationSplit[locationSplit.Length - 1];
+            creationUtilisateurKeycloakResponse.UserId = userId;
+        }
+
+        creationUtilisateurKeycloakResponse.IsSuccessStatusCode = response.Result.IsSuccessStatusCode && locationHeader != null;
+        return creationUtilisateurKeycloakResponse;
+
     }
-    public async Task<string> CreateUser(CreationUtilisateurDto dto)
+    public async Task<CreationUtilisateurKeycloakResponse> CreateUser(CreationUtilisateurDto dto)
     {
         var adminToken = await GetTokenAsync("admin-cli", "admin", "admin");
 
-        var idUser = await CreateUserAsync(dto, adminToken);
-        await ResetPasswordAsync(idUser, dto.Password);
+        var userCreationResponse = await CreateUserAsync(dto, adminToken);
 
-        return idUser;
+        if (userCreationResponse.IsSuccessStatusCode)
+        {
+            await ResetPasswordAsync(userCreationResponse.UserId, dto.Password);
+        }
+        return userCreationResponse;
+
 
     }
 
@@ -114,5 +127,16 @@ public class KeycloakClient
 
 public class KeycloakTokenResponseModel
 {
-    public String Access_token { get; set; }
+    public string Access_token { get; set; }
+}
+
+
+public class CreationUtilisateurKeycloakResponse
+{
+    public CreationUtilisateurKeycloakResponse()
+    {
+    }
+
+    public string UserId { get; set; }
+    public bool IsSuccessStatusCode { get; set; }
 }

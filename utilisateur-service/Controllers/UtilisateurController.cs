@@ -43,17 +43,17 @@ public class UtilisateurController : ControllerBase
         {
             return BadRequest("Les mots de passe ne sont pas les mêmes");
         }
-        var idCreated = await _keycloakClient.CreateUser(dto);
+        var utilisateurKeycloakResponse = await _keycloakClient.CreateUser(dto);
 
-        if (idCreated != null)
+        if (utilisateurKeycloakResponse.IsSuccessStatusCode)
         {
             Utilisateur utilisateur = Mapper.ConvertCreationUtilisateurDtoToUtilisateur(dto);
-            utilisateur.Id = idCreated;
+            utilisateur.Id = utilisateurKeycloakResponse.UserId;
             dbContext.Utilisateurs.Add(utilisateur);
             dbContext.SaveChanges();
             return Ok(utilisateur);
         }
-        return null;
+        return BadRequest();
     }
 
     [HttpGet]
