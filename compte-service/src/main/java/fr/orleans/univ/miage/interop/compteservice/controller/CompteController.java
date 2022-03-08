@@ -23,7 +23,7 @@ public class CompteController {
     @PostMapping(value = "/compte")
     public ResponseEntity<Object> createCompte(@RequestParam String idOwner, @RequestParam String libelle, @RequestParam String type) throws CompteIntrouvableException {
         try {
-            Compte compte = facadeCompte.saveCompte(new Compte(idOwner, libelle, type));  //TODO : generer un idCompte ?
+            Compte compte = facadeCompte.saveCompte(new Compte(idOwner, libelle, type));
             URI location = ServletUriComponentsBuilder
                     .fromCurrentRequestUri()
                     .path("/{id}")
