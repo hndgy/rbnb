@@ -52,11 +52,12 @@ public class FacadeCompteImpl implements FacadeCompte{
 
     @Override
     public void deleteCompteByIdCompte(Long idCompte) throws CompteIntrouvableException {
-        Optional<Compte> compte1 = compteRepository.findById(new Integer(Math.toIntExact(idCompte)));
+        Optional<Compte> compte1 = compteRepository.findById(idCompte);
         if (compte1.isPresent()){
             compteRepository.deleteCompteByIdCompte(idCompte);
         }
-        throw new CompteIntrouvableException();
+        else
+            throw new CompteIntrouvableException();
     }
 
     @Override
@@ -65,7 +66,9 @@ public class FacadeCompteImpl implements FacadeCompte{
         if (!compte1.isEmpty()){
             compteRepository.deleteComptesByIdOwner(idUser);
         }
-        throw new CompteIntrouvableException();
+        else
+            throw new CompteIntrouvableException();
     }
+
 
 }

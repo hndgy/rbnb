@@ -13,6 +13,14 @@ client.test("Request executed successfully", function() {
 
 ###
 
+
+POST localhost:8084/account/compte
+Content-Type: application/x-www-form-urlencoded
+
+idOwner=max&libelle=binance2&type=crypto2
+
+###
+
 GET localhost:8084/account/compte/{{idCompte}}
 
 > {%

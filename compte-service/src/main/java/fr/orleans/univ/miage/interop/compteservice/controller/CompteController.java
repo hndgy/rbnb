@@ -85,6 +85,7 @@ public class CompteController {
         }
     }
 
+    @Transactional
     @DeleteMapping(value = "/{idUser}/compte")
     public ResponseEntity<Object> deleteComptes (@PathVariable String idUser) {
         try {

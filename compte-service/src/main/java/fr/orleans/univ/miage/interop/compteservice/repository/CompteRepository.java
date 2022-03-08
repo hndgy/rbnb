@@ -12,6 +12,6 @@ public interface CompteRepository extends JpaRepository<Compte,Long> {
     Compte findCompteByIdCompte(Long idCompte);
     Collection<Compte> findComptesByIdOwner(String idOwner);
 
-    Compte deleteCompteByIdCompte(Long idCompte);
-    Collection<Compte> deleteComptesByIdOwner(String idOwner);
+    void deleteCompteByIdCompte(Long idCompte);
+    void deleteComptesByIdOwner(String idOwner);
 }
