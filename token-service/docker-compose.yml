@@ -1,0 +1,17 @@
+version: '3.3'
+services:
+  mysql-user-service:
+    image: mysql:8.0
+    platform: linux/amd64
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'TokenService'
+      MYSQL_USER: 'admin'
+      MYSQL_PASSWORD: '0000'
+      MYSQL_ROOT_PASSWORD: 'p'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    #volumes:
+      #- ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
