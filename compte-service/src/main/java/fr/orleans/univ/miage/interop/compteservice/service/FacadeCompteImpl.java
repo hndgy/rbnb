@@ -1,11 +1,17 @@
 package fr.orleans.univ.miage.interop.compteservice.service;
 
+import fr.orleans.univ.miage.interop.compteservice.dto.ResponseTemplateVO;
+import fr.orleans.univ.miage.interop.compteservice.dto.Transaction;
 import fr.orleans.univ.miage.interop.compteservice.model.Compte;
 import fr.orleans.univ.miage.interop.compteservice.repository.CompteRepository;
 import fr.orleans.univ.miage.interop.compteservice.service.Exception.CompteIntrouvableException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -14,6 +20,9 @@ public class FacadeCompteImpl implements FacadeCompte{
 
     @Autowired
     public CompteRepository compteRepository;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public Compte saveCompte(Compte compte) {
@@ -69,6 +78,25 @@ public class FacadeCompteImpl implements FacadeCompte{
         else
             throw new CompteIntrouvableException();
     }
+
+    /*
+    @Override
+    public ResponseTemplateVO findTransactionsByIdCompte(Long idCompte) {
+        ResponseTemplateVO vo = new ResponseTemplateVO();
+        Compte compte = compteRepository.findCompteByIdCompte(idCompte);
+
+        ResponseEntity<Transaction[]> response = restTemplate.getForEntity("http://Transaction-Service/transaction/" + idCompte, Transaction[].class);
+        Transaction [] transactionArray = response.getBody();
+        Collection<Transaction> transactions = Arrays.stream(transactionArray).toList();
+        //TODO : ????????
+
+        vo.setCompte(compte);
+        vo.setTransactions(transactions);
+
+        return vo;
+    }
+
+     */
 
 
 }

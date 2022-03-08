@@ -1,5 +1,6 @@
 package fr.orleans.univ.miage.interop.compteservice.service;
 
+import fr.orleans.univ.miage.interop.compteservice.dto.ResponseTemplateVO;
 import fr.orleans.univ.miage.interop.compteservice.model.Compte;
 import fr.orleans.univ.miage.interop.compteservice.service.Exception.CompteIntrouvableException;
 
@@ -19,4 +20,5 @@ public interface FacadeCompte {
 
     void deleteComptesByIdOwner(String idUser) throws CompteIntrouvableException;
 
+    //ResponseTemplateVO findTransactionsByIdCompte(Long idCompte);
 }
