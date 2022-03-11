@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.orleans.univ.miage.interop.tokenservice.model.Token;
 import fr.orleans.univ.miage.interop.tokenservice.service.TokenService;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,11 +28,16 @@ public class TokenServiceApplication {
 	}
 
 	@Bean
+	public ModelMapper modelMapper(){
+		return new ModelMapper();
+	}
+
+	@Bean
 	public CommandLineRunner runner(TokenService tokenService){
 		return args -> {
 			ObjectMapper mapper = new ObjectMapper();
 			TypeReference<List<Token>> typeReference = new TypeReference<List<Token>>() {};
-			InputStream inputStream = TypeReference.class.getResourceAsStream("/json/response_cg.json");
+			InputStream inputStream = TypeReference.class.getResourceAsStream("/json/response.json");
 			try {
 				List<Token> tokens = mapper.readValue(inputStream,typeReference);
 				tokenService.saveTokens(tokens);

@@ -1,5 +1,6 @@
 package fr.orleans.univ.miage.interop.tokenservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import javax.persistence.*;
 @Setter
 @Getter
 @Table(name = "Token")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Token {
 
     @Id
@@ -27,7 +29,6 @@ public class Token {
     @Column(name = "nom")
     private String name;
 
-    @Column(name = "prix")
-    private Double price;
+
 
 }
