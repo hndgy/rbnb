@@ -1,21 +1,30 @@
 package fr.orleans.univ.miage.interop.tokenservice.controller;
+import fr.orleans.univ.miage.interop.tokenservice.dto.TokenDto;
 import fr.orleans.univ.miage.interop.tokenservice.model.Token;
-import fr.orleans.univ.miage.interop.tokenservice.service.CoinGeckoService;
+import fr.orleans.univ.miage.interop.tokenservice.service.NomicsService;
 import fr.orleans.univ.miage.interop.tokenservice.service.TokenServiceImpl;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1")
 public class TokenController {
 
+
     private TokenServiceImpl tokenService;
 
-    private CoinGeckoService coinGeckoService;
+    private NomicsService nomicsService;
 
-    public TokenController(TokenServiceImpl tokenService, CoinGeckoService coinGeckoService) {
+    @Autowired
+    private ModelMapper modelMapper;
+
+    public TokenController(TokenServiceImpl tokenService, NomicsService nomicsService) {
         this.tokenService = tokenService;
-        this.coinGeckoService = coinGeckoService;
+        this.nomicsService = nomicsService;
     }
 
     @GetMapping("/list")
@@ -30,11 +39,20 @@ public class TokenController {
     }
 
     @RequestMapping(value = "/delete/{id}")
-    public String deleteCoinById(@PathVariable Long id) throws Exception {
+    public void deleteCoinById(@PathVariable Long id) throws Exception {
         tokenService.deleteTokenById(id);
-        return "redirect:/list";
     }
 
-    public ResponseEntity<>
+    @GetMapping("token/price/{id}")
+    public ResponseEntity<TokenDto[]> getPriceToken(@PathVariable String id) throws IOException {
+        TokenDto[] tokenDto = nomicsService.getPrice(id);
+//        Token[] token = convertToEntity(tokenDto);
+        return ResponseEntity.ok(tokenDto);
+    }
+
+   /* private Token[] convertToEntity(TokenDto[] tokenDto){
+        Token[] tokenEntity = modelMapper.map(tokenDto, Token[].class);
+        return tokenEntity;
+    }*/
 
 }

@@ -1,39 +1,38 @@
 package fr.orleans.univ.miage.interop.tokenservice.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.orleans.univ.miage.interop.tokenservice.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class CoinGeckoService {
+public class NomicsService {
 
     @Autowired
     private RestTemplate restTemplate;
 
+    @Value("${api.key}")
+    private String apiKey;
+
     private static final long TOKENS_CACHE_LIFETIME = TimeUnit.MINUTES.toMillis(10);
-    private static final String TOKEN_PRICE_URL = "https://api.coingecko.com/api/v3/simple/price?ids={id}&vs_currencies=eur";
+    private static final String TOKEN_PRICE_URL = "https://api.nomics.com/v1/currencies/ticker?key={apiKey}&ids={id}&per-page=1&convert=EUR";
 
     private final Map<String, Double> priceTokenCache = new HashMap<>();
     private final Map<TokenDto, LocalDateTime> tokenRefresh = new HashMap<>();
-    private long lastTokensCacheRefresh = 0;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    /*private long lastTokensCacheRefresh = 0;*/
 
 
-    public TokenDto getPrice(String id) throws IOException {
-        return restTemplate.getForObject(TOKEN_PRICE_URL, TokenDto.class, id);
+    public TokenDto[] getPrice(String id) throws IOException {
+        return restTemplate.getForObject(TOKEN_PRICE_URL, TokenDto[].class, apiKey, id);
     }
 
-   private void refreshCache() throws IOException {
+   /*private void refreshCache() throws IOException {
        if (System.currentTimeMillis() - lastTokensCacheRefresh < TOKENS_CACHE_LIFETIME){
            return;
        }
@@ -49,7 +48,7 @@ public class CoinGeckoService {
        }
        lastTokensCacheRefresh = System.currentTimeMillis();
        System.out.println("Cache rafraichit");
-   }
+   }*/
 
 
 
