@@ -6,15 +6,14 @@ using utilisateur_service.Dtos;
 namespace utilisateur_service.Models;
 public class KeycloakClient
 {
-
     private HttpClient _httpClient;
     private String _reaml;
     private String _host;
-    public KeycloakClient(String host, String realm)
+    public KeycloakClient(IConfiguration config)
     {
         _httpClient = new HttpClient();
-        _host = host;
-        _reaml = realm;
+        _host = config.GetValue<string>("keycloak:host");
+        _reaml = config.GetValue<string>("keycloak:realm");
     }
 
     public async Task<String> GetTokenAsync(String clientId, String username, String password)
@@ -29,7 +28,7 @@ public class KeycloakClient
         });
 
         var response = _httpClient.PostAsync(
-            _host + "/realms/master/protocol/openid-connect/token",
+            _host + "/auth/realms/master/protocol/openid-connect/token",
             content
         );
 
@@ -57,8 +56,10 @@ public class KeycloakClient
             "application/json"
         );
 
-        var response = _httpClient.PostAsync(
-            _host + "/admin/realms/" + _reaml + "/users/" + idUser + "/reset-password",
+
+        Console.WriteLine(_host + "/auth/admin/realms/" + _reaml + "/users/" + idUser + "/reset-password");
+        var response = _httpClient.PutAsync(
+            _host + "/auth/admin/realms/" + _reaml + "/users/" + idUser + "/reset-password",
             content
         );
         response.Wait();
@@ -86,10 +87,10 @@ public class KeycloakClient
             Encoding.UTF8,
             "application/json"
         );
-        Console.WriteLine(_host + "/admin/realms/" + _reaml + "/users");
+        Console.WriteLine(_host + "/auth/admin/realms/" + _reaml + "/users");
 
         var response = _httpClient.PostAsync(
-            _host + "/admin/realms/" + _reaml + "/users",
+            _host + "/auth/admin/realms/" + _reaml + "/users",
             content
         );
         response.Wait();
@@ -111,6 +112,8 @@ public class KeycloakClient
     public async Task<CreationUtilisateurKeycloakResponse> CreateUser(CreationUtilisateurDto dto)
     {
         var adminToken = await GetTokenAsync("admin-cli", "admin", "admin");
+
+        Console.WriteLine("Token admin =" + adminToken);
 
         var userCreationResponse = await CreateUserAsync(dto, adminToken);
 
