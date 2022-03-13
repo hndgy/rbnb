@@ -1,10 +1,12 @@
 package fr.orleans.univ.miage.interop.tokenservice.service;
 
+import fr.orleans.univ.miage.interop.tokenservice.dto.TokenDto;
 import fr.orleans.univ.miage.interop.tokenservice.exception.TokenNotFoundException;
 import fr.orleans.univ.miage.interop.tokenservice.model.Token;
 import fr.orleans.univ.miage.interop.tokenservice.repository.TokenRepo;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +15,15 @@ import java.util.Optional;
 @Service
 public class TokenServiceImpl implements TokenService{
 
-    public final TokenRepo tokenRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
-    public TokenServiceImpl(TokenRepo tokenRepository) {
+    public final TokenRepo tokenRepository;
+    public final NomicsService nomicsService;
+
+    public TokenServiceImpl(TokenRepo tokenRepository, NomicsService nomicsService) {
         this.tokenRepository = tokenRepository;
+        this.nomicsService = nomicsService;
     }
 
     @Override
@@ -25,13 +32,16 @@ public class TokenServiceImpl implements TokenService{
     }
 
     @Override
-    public List<Token> getAllTokens() {
-        List<Token> res = tokenRepository.findAll();
-        if (res.size() > 0){
-            return res;
-        }else {
-            return new ArrayList<>();
+    public List<TokenDto> getAllTokens() throws TokenNotFoundException, InterruptedException {
+       List<Token> tokens = tokenRepository.findAll();
+       List<TokenDto> res = new ArrayList<>();
+       for (var token: tokens){
+           Thread.sleep(1000);
+           var dto = this.modelMapper.map(token, TokenDto.class);
+           dto.setPrice(nomicsService.getPrice(token.getIdApi()));
+           res.add(dto);
         }
+       return res;
     }
 
     @Override
@@ -41,19 +51,22 @@ public class TokenServiceImpl implements TokenService{
         if (token.isPresent()){
             tokenRepository.deleteById(idToken);
         }else {
-            throw new TokenNotFoundException("Token non trouvé");
+            throw new TokenNotFoundException(idToken.toString());
         }
     }
 
-    @Override
-    public Token getTokenById(Long idToken) {
-        return tokenRepository.getById(idToken);
+    public Token getTokenById(Long id){
+        return tokenRepository.getById(id);
     }
 
     @Override
-    public Token findTokenByName(String name) {
-        return tokenRepository.findTokenByName(name);
+    public Token getTokenByIdApi(String id) {
+        return tokenRepository.getTokenByIdApi(id);
     }
 
+      /* private Token[] convertToEntity(TokenDto[] tokenDto){
+        Token[] tokenEntity = modelMapper.map(tokenDto, Token[].class);
+        return tokenEntity;
+    }*/
 
 }

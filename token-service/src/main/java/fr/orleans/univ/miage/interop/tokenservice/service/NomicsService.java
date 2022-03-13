@@ -1,17 +1,21 @@
 package fr.orleans.univ.miage.interop.tokenservice.service;
 
 import fr.orleans.univ.miage.interop.tokenservice.dto.TokenDto;
+import fr.orleans.univ.miage.interop.tokenservice.exception.TokenNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import java.io.IOException;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@RefreshScope
 public class NomicsService {
 
     @Autowired
@@ -28,8 +32,13 @@ public class NomicsService {
     /*private long lastTokensCacheRefresh = 0;*/
 
 
-    public TokenDto[] getPrice(String id) throws IOException {
-        return restTemplate.getForObject(TOKEN_PRICE_URL, TokenDto[].class, apiKey, id);
+    public BigDecimal getPrice(String id) throws TokenNotFoundException {
+        TokenDto[] tokensDto = restTemplate.getForObject(TOKEN_PRICE_URL, TokenDto[].class, apiKey, id);
+        if (tokensDto != null) {
+            return tokensDto[0].getPrice();
+        }else{
+            throw new TokenNotFoundException(id);
+        }
     }
 
    /*private void refreshCache() throws IOException {

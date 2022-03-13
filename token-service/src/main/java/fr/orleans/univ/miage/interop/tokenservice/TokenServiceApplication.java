@@ -7,7 +7,9 @@ import fr.orleans.univ.miage.interop.tokenservice.service.TokenService;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,6 +18,7 @@ import java.io.InputStream;
 import java.util.List;
 
 @SpringBootApplication
+@EnableDiscoveryClient
 public class TokenServiceApplication {
 
 	public static void main(String[] args) {

@@ -1,8 +1,5 @@
 package fr.orleans.univ.miage.interop.tokenservice.dto;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import fr.orleans.univ.miage.interop.tokenservice.MoneySerializer;
@@ -28,7 +25,9 @@ public class TokenDto {
 
     @JsonSerialize(using = MoneySerializer.class)
     private BigDecimal price;
-    
 
-
+    public TokenDto setPrice(BigDecimal price) {
+        this.price = price;
+        return this;
+    }
 }
