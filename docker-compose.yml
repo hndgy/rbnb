@@ -31,7 +31,7 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./keycloak:/opt/jboss/keycloak/imports
+      - ./dump/realm-export.json:/opt/jboss/keycloak/imports
     command:
       - "-b 0.0.0.0 -Dkeycloak.import=/opt/jboss/keycloak/imports/realm-export.json"
     environment:
@@ -45,7 +45,6 @@ services:
       KEYCLOAK_PASSWORD: admin
     depends_on:
       - mysql
-    
 
 
   mysql:
