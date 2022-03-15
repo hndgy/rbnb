@@ -1,58 +1,50 @@
 package fr.orleans.univ.miage.interop.tokenservice.controller;
 import fr.orleans.univ.miage.interop.tokenservice.dto.TokenDto;
+import fr.orleans.univ.miage.interop.tokenservice.exception.TokenNotFoundException;
 import fr.orleans.univ.miage.interop.tokenservice.model.Token;
 import fr.orleans.univ.miage.interop.tokenservice.service.NomicsService;
-import fr.orleans.univ.miage.interop.tokenservice.service.TokenServiceImpl;
+import fr.orleans.univ.miage.interop.tokenservice.service.TokenService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import java.math.BigDecimal;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/token")
 public class TokenController {
 
 
-    private TokenServiceImpl tokenService;
-
-    private NomicsService nomicsService;
+    private final NomicsService nomicsService;
+    private TokenService tokenService;
 
     @Autowired
     private ModelMapper modelMapper;
 
-    public TokenController(TokenServiceImpl tokenService, NomicsService nomicsService) {
+
+    public TokenController(TokenService tokenService, NomicsService nomicsService) {
         this.tokenService = tokenService;
         this.nomicsService = nomicsService;
     }
 
-    @GetMapping("/list")
-    public Iterable<Token> list(){
+    @GetMapping("/")
+    public Iterable<TokenDto> list() throws TokenNotFoundException, InterruptedException {
         return tokenService.getAllTokens();
     }
 
-    @GetMapping("/token/{id}")
-    public ResponseEntity<Token> getToken(@PathVariable Long id){
-        Token token = tokenService.getTokenById(id);
-        return ResponseEntity.ok(token);
-    }
-
-    @RequestMapping(value = "/delete/{id}")
+    @DeleteMapping(value = "/{id}")
     public void deleteCoinById(@PathVariable Long id) throws Exception {
         tokenService.deleteTokenById(id);
     }
 
-    @GetMapping("token/price/{id}")
-    public ResponseEntity<TokenDto[]> getPriceToken(@PathVariable String id) throws IOException {
-        TokenDto[] tokenDto = nomicsService.getPrice(id);
-//        Token[] token = convertToEntity(tokenDto);
+    @GetMapping("/{id}")
+    public ResponseEntity<TokenDto> getToken(@PathVariable String id) throws TokenNotFoundException {
+        Token token = tokenService.getTokenByIdApi(id);
+        TokenDto tokenDto = this.modelMapper.map(token, TokenDto.class);
+        BigDecimal priceDto = nomicsService.getPrice(id);
+        tokenDto.setPrice(priceDto);
         return ResponseEntity.ok(tokenDto);
     }
-
-   /* private Token[] convertToEntity(TokenDto[] tokenDto){
-        Token[] tokenEntity = modelMapper.map(tokenDto, Token[].class);
-        return tokenEntity;
-    }*/
 
 }

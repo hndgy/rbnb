@@ -1,6 +1,7 @@
 package fr.orleans.univ.miage.interop.tokenservice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,11 +18,12 @@ public class Token {
 
     @Id
     @GeneratedValue
-    @Column(name = "idToken")
+    @Column(name = "id")
     private Long idToken;
 
-    @Column(name = "idCoinGecko")
-    private String id;
+    @Column(name = "idNomics")
+    @JsonProperty("id")
+    private String idApi;
 
     @Column(name = "symbole")
     private String symbol;
