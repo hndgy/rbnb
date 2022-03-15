@@ -1,5 +1,10 @@
 version: '3.3'
 services:
+  discovery:
+    image: consul:1.9
+    ports:
+      - 8500:8500
+
   utilisateur-service:
     build: ./utilisateur-service
     ports:
@@ -45,7 +50,6 @@ services:
       KEYCLOAK_PASSWORD: admin
     depends_on:
       - mysql
-
 
   mysql:
     image: mysql:8.0.20
