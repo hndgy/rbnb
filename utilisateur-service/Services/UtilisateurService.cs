@@ -10,7 +10,7 @@ public class UtilisateurService : IUtilisateurService
     public KeycloakClient _keycloakClient { get; private set; }
     public UserServiceDbContext dbContext { get; private set; }
 
-    public UtilisateurService()
+    public UtilisateurService(IConfiguration config)
     {
         var appSettings = System.Configuration.ConfigurationManager.AppSettings;
         var kcHost = appSettings["keycloak:host"];
@@ -19,10 +19,7 @@ public class UtilisateurService : IUtilisateurService
         {
             throw new Exception("Veuillez saisir les champs host et realms dans le ficher appSettings.cs");
         }
-        _keycloakClient = new KeycloakClient(
-           host: kcHost,
-           realm: kcRealm
-       );
+        _keycloakClient = new KeycloakClient(config);
 
         dbContext = new UserServiceDbContext();
     }
