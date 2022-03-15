@@ -1,0 +1,58 @@
+version: '3.3'
+services:
+  utilisateur-service:
+    build: ./utilisateur-service
+    ports:
+      - "9001:80"
+    depends_on:
+      - mysql-utilisateur-service
+  mysql-utilisateur-service:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'UtilisateurService'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: '1234'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'p'
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - '3306:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '3306'
+      # Where our data will be persisted
+    volumes:
+      - ./dump/onstart-utlisateur-service-mysql.sql:/docker-entrypoint-initdb.d/create.sql
+  keycloak:
+    image: jboss/keycloak
+    ports:
+      - 8080:8080
+    volumes:
+      - ./dump/realm-export.json:/opt/jboss/keycloak/imports
+    command:
+      - "-b 0.0.0.0 -Dkeycloak.import=/opt/jboss/keycloak/imports/realm-export.json"
+    environment:
+      DB_VENDOR: mysql
+      DB_ADDR: mysql
+      DB_USER: keycloak
+      DB_PASSWORD: keycloak
+      DB_PORT: 3306
+      DB_DATABASE: keycloak
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+    depends_on:
+      - mysql
+
+
+  mysql:
+    image: mysql:8.0.20
+    environment:
+      MYSQL_ROOT_PASSWORD: p
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: keycloak
+      MYSQL_DATABASE: keycloak
+    ports:
+      - 3307:3306
