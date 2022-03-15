@@ -1,4 +1,5 @@
 package fr.orleans.univ.miage.interop.tokenservice.controller;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.orleans.univ.miage.interop.tokenservice.dto.TokenDto;
 import fr.orleans.univ.miage.interop.tokenservice.exception.TokenNotFoundException;
 import fr.orleans.univ.miage.interop.tokenservice.model.Token;
@@ -28,10 +29,10 @@ public class TokenController {
         this.nomicsService = nomicsService;
     }
 
-    @GetMapping("/")
-    public Iterable<TokenDto> list() throws TokenNotFoundException, InterruptedException {
+   /* @GetMapping("/")
+    public Iterable<TokenDto> list() throws TokenNotFoundException, InterruptedException, JsonProcessingException {
         return tokenService.getAllTokens();
-    }
+    }*/
 
     @DeleteMapping(value = "/{id}")
     public void deleteCoinById(@PathVariable Long id) throws Exception {
@@ -45,6 +46,11 @@ public class TokenController {
         BigDecimal priceDto = nomicsService.getPrice(id);
         tokenDto.setPrice(priceDto);
         return ResponseEntity.ok(tokenDto);
+    }
+
+    @GetMapping("/test")
+    public Iterable<TokenDto> listPrix() throws JsonProcessingException {
+        return tokenService.getAllPrice();
     }
 
 }
