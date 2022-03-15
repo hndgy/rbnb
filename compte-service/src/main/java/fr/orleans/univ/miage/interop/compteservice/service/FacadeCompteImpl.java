@@ -79,13 +79,13 @@ public class FacadeCompteImpl implements FacadeCompte{
             throw new CompteIntrouvableException();
     }
 
-    /*
+
     @Override
-    public ResponseTemplateVO findTransactionsByIdCompte(Long idCompte) {
+    public ResponseTemplateVO findCompteWithTransactions(Long idCompte) {
         ResponseTemplateVO vo = new ResponseTemplateVO();
         Compte compte = compteRepository.findCompteByIdCompte(idCompte);
 
-        ResponseEntity<Transaction[]> response = restTemplate.getForEntity("http://Transaction-Service/transaction/" + idCompte, Transaction[].class);
+        ResponseEntity<Transaction[]> response = restTemplate.getForEntity("http://transaction-service/transaction/" + idCompte, Transaction[].class);
         Transaction [] transactionArray = response.getBody();
         Collection<Transaction> transactions = Arrays.stream(transactionArray).toList();
         //TODO : ????????
@@ -95,8 +95,6 @@ public class FacadeCompteImpl implements FacadeCompte{
 
         return vo;
     }
-
-     */
 
 
 }

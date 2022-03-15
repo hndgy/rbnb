@@ -97,4 +97,13 @@ public class CompteController {
         }
     }
 
+    @GetMapping(value = "/urldebenoit")
+    public ResponseEntity<Object> getCompteWithTransaction(@PathVariable Long idCompte){
+        try {
+            return ResponseEntity.ok().body(facadeCompte.findCompteWithTransactions(idCompte));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

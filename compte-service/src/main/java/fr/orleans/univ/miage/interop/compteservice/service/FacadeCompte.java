@@ -20,5 +20,5 @@ public interface FacadeCompte {
 
     void deleteComptesByIdOwner(String idUser) throws CompteIntrouvableException;
 
-    //ResponseTemplateVO findTransactionsByIdCompte(Long idCompte);
+    ResponseTemplateVO findCompteWithTransactions(Long idCompte);
 }
