@@ -18,4 +18,10 @@ public class Logement {
     private Long id;
     private String libelle;
 
+
+
+    @ManyToOne
+    @JoinColumn(name = "proprietaire_id")
+    private Utilisateur proprietaire;
+
 }
