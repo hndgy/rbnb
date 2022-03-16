@@ -15,7 +15,7 @@ import javax.persistence.OneToOne;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Document
+@Document(collection = "Commentaire")
 public class Commentaire {
     @Id
     private String id;

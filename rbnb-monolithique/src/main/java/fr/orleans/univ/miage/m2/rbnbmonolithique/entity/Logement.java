@@ -13,6 +13,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "Logement")
 public class Logement {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

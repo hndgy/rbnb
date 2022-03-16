@@ -18,7 +18,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Document
+@Document(collection = "Disponibilite")
 public class Disponibilite {
     @Id
     private String id;
