@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -21,9 +22,11 @@ public class Reservation {
     private String id;
     
     @Field(name = "date_debut")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateDebut;
     
     @Field(name = "date_fin")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateFin;
     @Field(name="nb_voyageurs")
     private int nbVoyageurs;
@@ -32,6 +35,6 @@ public class Reservation {
     private Long idClient;
 
     @Field(name = "id_logement")
-    private Logement idLogement;
+    private Long idLogement;
 
 }

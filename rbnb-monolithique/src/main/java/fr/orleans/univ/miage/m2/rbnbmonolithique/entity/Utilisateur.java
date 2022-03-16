@@ -1,9 +1,11 @@
 package fr.orleans.univ.miage.m2.rbnbmonolithique.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -23,6 +25,8 @@ public class Utilisateur {
     private String prenom;
     private String adresse;
     private String ville;
+
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     private Date dateDeNaissance;
 
 
