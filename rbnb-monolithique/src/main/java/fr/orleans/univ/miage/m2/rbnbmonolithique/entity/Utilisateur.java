@@ -1,0 +1,29 @@
+package fr.orleans.univ.miage.m2.rbnbmonolithique.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.util.Collection;
+import java.util.Date;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+public class Utilisateur {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String nom;
+    private String prenom;
+    private String adresse;
+    private String ville;
+    private Date birthDate;
+
+
+    @OneToMany(mappedBy = "client")
+    private Collection<Reservation> reservations;
+}
