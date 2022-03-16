@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,15 +18,18 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Document
 public class Disponibilite {
     @Id
     private String id;
+
+    @Field(name = "date_debut")
     private Date dateDebut;
+
+    @Field(name = "date_fin")
     private Date dateFin;
 
-    @ManyToOne(fetch = javax.persistence.FetchType.LAZY)
-    @JoinColumn(name = "logement_id")
-    private Logement logement;
+    @Field(name = "id_logement")
+    private Long idLogement;
 
 }

@@ -18,10 +18,4 @@ public class Logement {
     private Long id;
     private String libelle;
 
-    @OneToMany(mappedBy = "logement")
-    private Collection<Disponibilite> disponibilites;
-
-    @OneToMany(mappedBy = "logement")
-    private Collection<Reservation> reservations;
-
 }

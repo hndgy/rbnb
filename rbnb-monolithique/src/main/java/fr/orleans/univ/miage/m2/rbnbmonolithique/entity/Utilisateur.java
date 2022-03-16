@@ -21,9 +21,8 @@ public class Utilisateur {
     private String prenom;
     private String adresse;
     private String ville;
-    private Date birthDate;
+    private Date dateDeNaissance;
 
 
-    @OneToMany(mappedBy = "client")
-    private Collection<Reservation> reservations;
+
 }
