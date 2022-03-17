@@ -19,8 +19,8 @@ public class Logement {
     private Long id;
     private String libelle;
 
-    @Enumerated(value = EnumType.STRING)
-    private Categorie categorie;
+    @ManyToMany
+    private Collection<Categorie> categories;
 
     @ManyToOne
     @JoinColumn(name = "proprietaire_id")
