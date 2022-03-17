@@ -23,4 +23,6 @@ public class Logement {
     @JoinColumn(name = "proprietaire_id")
     private Utilisateur proprietaire;
 
+    @ManyToMany(mappedBy = "logements")
+    private Collection<Categorie> categories;
 }

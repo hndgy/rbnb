@@ -18,7 +18,7 @@ import java.util.Collection;
 public class Categorie {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    private Long id;
     private String libelle;
 
     @ManyToMany
@@ -27,4 +27,6 @@ public class Categorie {
             joinColumns = @JoinColumn(name = "categorie_id"),
             inverseJoinColumns = @JoinColumn(name = "logement_id"))
     private Collection<Logement> logements;
+
+
 }

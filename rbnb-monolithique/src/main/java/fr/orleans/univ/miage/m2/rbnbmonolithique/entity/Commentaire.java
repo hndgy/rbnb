@@ -17,11 +17,11 @@ import java.util.Collection;
 @Table(name = "Commentaire")
 public class Commentaire {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    private Long id;
     private String idReservation;
     private String contenu;
 
-    @OneToMany(mappedBy = "commentaire")
+    @OneToMany(mappedBy = "commentaire", cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true)
     private Collection<Notation> notations;
 
 }
