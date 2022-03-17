@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "Notation")
 public class Notation {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
     private int etoile;
 
