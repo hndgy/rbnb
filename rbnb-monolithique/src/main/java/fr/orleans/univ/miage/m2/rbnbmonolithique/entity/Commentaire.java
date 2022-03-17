@@ -16,7 +16,7 @@ import java.util.Collection;
 @Entity
 @Table(name = "Commentaire")
 public class Commentaire {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
     private String idReservation;
     private String contenu;

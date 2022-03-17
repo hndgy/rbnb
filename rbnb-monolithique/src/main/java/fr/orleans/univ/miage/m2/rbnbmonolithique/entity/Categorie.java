@@ -17,9 +17,10 @@ import java.util.Collection;
 @Table(name = "Categorie")
 public class Categorie {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
     private String libelle;
+
     @ManyToMany
     @JoinTable(
             name = "categorie_logement",
