@@ -7,21 +7,19 @@ import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
-import java.util.Collection;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Commentaire")
-public class Commentaire {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Table(name = "Notation")
+public class Notation {
+    @Id
     private String id;
-    private String idReservation;
-    private String contenu;
+    private int etoile;
 
-    @OneToMany
-    private Collection<Notation> notations;
+    @ManyToOne
+    private Prestation prestation;
 
 }

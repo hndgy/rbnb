@@ -4,24 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
-import java.util.Collection;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Commentaire")
-public class Commentaire {
+@Table(name = "Prestation")
+public class Prestation {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
-    private String idReservation;
-    private String contenu;
+    private Long id;
 
-    @OneToMany
-    private Collection<Notation> notations;
-
+    private String libelle;
 }
