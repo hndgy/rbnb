@@ -5,5 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 public interface LogementRepo extends JpaRepository<Logement, Long> {
-    Logement getLogementById(Long id);
 }

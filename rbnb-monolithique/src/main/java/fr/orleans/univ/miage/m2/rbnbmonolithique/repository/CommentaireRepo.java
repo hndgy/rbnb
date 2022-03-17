@@ -9,5 +9,5 @@ import org.springframework.data.mongodb.repository.Query;
 public interface CommentaireRepo extends JpaRepository<Commentaire, Long> {
 
 
-    Commentaire getCommentaireByIdReservation(String idReservation);
+    Commentaire findByIdReservation(String idReservation);
 }

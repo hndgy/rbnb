@@ -11,5 +11,5 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RepositoryRestResource(path = "disponibilite")
 public interface DisponibiliteRepo extends MongoRepository<Disponibilite, String> {
 
-    Disponibilite getDisponibiliteByIdLogement(Long idLogement);
+    Disponibilite findByIdLogement(Long idLogement);
 }

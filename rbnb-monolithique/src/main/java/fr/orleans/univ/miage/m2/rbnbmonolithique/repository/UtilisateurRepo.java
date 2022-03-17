@@ -7,6 +7,5 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource(path = "user")
 public interface UtilisateurRepo extends JpaRepository<Utilisateur, Long> {
 
-    Utilisateur getUtilisateurById(Long id);
 
 }

@@ -6,5 +6,4 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 @RepositoryRestResource(path = "reservation")
 public interface ReservationRepo extends MongoRepository<Reservation, String> {
-    Reservation getReservationById(String id);
 }
