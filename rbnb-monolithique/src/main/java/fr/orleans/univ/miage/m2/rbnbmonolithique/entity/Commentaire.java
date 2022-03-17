@@ -21,7 +21,7 @@ public class Commentaire {
     private String idReservation;
     private String contenu;
 
-    @OneToMany
+    @OneToMany(mappedBy = "commentaire")
     private Collection<Notation> notations;
 
 }

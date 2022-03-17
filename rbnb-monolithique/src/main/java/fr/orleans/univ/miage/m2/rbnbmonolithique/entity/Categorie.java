@@ -22,7 +22,7 @@ public class Categorie {
     private String libelle;
     @ManyToMany
     @JoinTable(
-            name = "Categorie_Logement",
+            name = "categorie_logement",
             joinColumns = @JoinColumn(name = "categorie_id"),
             inverseJoinColumns = @JoinColumn(name = "logement_id"))
     private Collection<Logement> logements;

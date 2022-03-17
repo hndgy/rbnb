@@ -15,11 +15,15 @@ import javax.persistence.*;
 @Entity
 @Table(name = "Notation")
 public class Notation {
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     private int etoile;
 
     @ManyToOne
     private Prestation prestation;
+
+    @ManyToOne
+    @JoinColumn(name = "commentaire_id", referencedColumnName="id")
+    private Commentaire commentaire;
 
 }

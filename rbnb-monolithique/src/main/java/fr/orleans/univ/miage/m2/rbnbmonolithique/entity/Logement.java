@@ -19,9 +19,6 @@ public class Logement {
     private Long id;
     private String libelle;
 
-    @ManyToMany
-    private Collection<Categorie> categories;
-
     @ManyToOne
     @JoinColumn(name = "proprietaire_id")
     private Utilisateur proprietaire;
