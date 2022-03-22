@@ -1,5 +1,6 @@
 package fr.orleans.univ.miage.m2.rbnbmonolithique.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,21 +14,22 @@ import java.security.Principal;
 @RequestMapping("/api")
 public class RbnbController {
 
-    @RolesAllowed("user")
+    @RolesAllowed("USER")
     @GetMapping("hello")
     public String hello(Principal principal){
-        return principal.toString();
+        return "connected as user with id =" +principal.getName();
     }
-
 
     @GetMapping("norole")
     public String noauth(Principal principal){
-        return principal.toString();
+        return "connected with no role with id =" + principal.toString();
     }
 
     @RolesAllowed("ADMIN")
     @GetMapping("admin")
     public String admin(Principal principal){
-        return principal.getName();
+        return "connected as admin with id =" + principal.getName();
     }
+
+
 }
