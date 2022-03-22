@@ -2,6 +2,11 @@ version: '3.8'
 
 
 services:
+  discovery:
+    image: consul:1.9
+    ports:
+      - "8500:8500"
+
   keycloak:
     image: jboss/keycloak
     environment:
@@ -16,7 +21,7 @@ services:
     ports:
       - "9001:8080"
     #volumes:
-     # - ./keycloak:/tmp
+     # - ../dump/export-realm.json:/tmp/export-realm.json
     #depends_on:
     #  - mysql-keycloak
 
