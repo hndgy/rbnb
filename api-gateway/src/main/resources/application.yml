@@ -1,0 +1,38 @@
+
+spring:
+
+  application:
+    name: rbnb-api-gateway
+
+  cloud:
+
+    consul:
+      discovery:
+        register: true
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      loadbalancer:
+        ribbon:
+          enabled: false
+
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+
+      routes:
+        - id: rewritepath_route_keycloak
+          uri: lb://service-auth
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - RewritePath=/api/auth(?<segment>/?.*), /authent$\{segment}
+        - id: rewritepath_route_monolithique
+          uri: lb://rbnb-monolithique
+          predicates:
+            - Path=/api/mono/**
+          filters:
+            - RewritePath=/api/mono(?<segment>/?.*), /api$\{segment}
+            - PreserveHostHeader
+server:
+  port: 9009
