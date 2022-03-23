@@ -7,23 +7,17 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Notation")
-public class Notation {
+@Table(name = "Prestation")
+public class Prestation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
     private Long id;
 
-    private int etoile;
-
-    @ManyToOne
-    @JoinColumn(name = "prestation_ID")
-    private Prestation prestation;
-
-
+    private String libelle;
 }
