@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Date;
 
 @Getter
@@ -22,19 +23,11 @@ public class Review {
 
     private String contenu;
 
-    private String idReservation;
-
     private Date date;
 
-    private int note;
+    private String idUtilisateur;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user", nullable = false)
-    private Utilisateur utilisateur;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_logement", nullable = false)
-    private Logement logement;
+    private Long idLogement;
 
 //    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true)
 //    private Collection<Notation> notations;

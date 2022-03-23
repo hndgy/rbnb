@@ -1,23 +1,21 @@
 package fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.controller;
 
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.ReviewDto;
-import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.entity.Review;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.exception.ReviewNotFoundException;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.service.ReviewService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
+import java.security.Principal;
 import java.util.List;
 
+
 @RestController
-@RequestMapping("/api/v1/review")
+@RequestMapping("/review")
 public class ReviewController {
 
-    @Autowired
-    public ModelMapper modelMapper;
 
     private ReviewService reviewService;
 
@@ -27,20 +25,14 @@ public class ReviewController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ReviewDto> getReviewById(@PathVariable(name = "id")Long id) throws ReviewNotFoundException {
-        Review review = reviewService.getReviewById(id);
-        ReviewDto returnReview = modelMapper.map(review, ReviewDto.class);
-        return ResponseEntity.ok().body(returnReview);
+        ReviewDto reviewDto = reviewService.getReviewById(id);
+        return ResponseEntity.ok().body(reviewDto);
     }
 
     @PostMapping
     public ResponseEntity<ReviewDto> createReview(@RequestBody ReviewDto reviewDto){
-        Review reviewPost = modelMapper.map(reviewDto, Review.class);
-
-        Review review = reviewService.createReview(reviewPost);
-
-        ReviewDto reviewDtoResponse = modelMapper.map(review, ReviewDto.class);
-
-        return new ResponseEntity<>(reviewDtoResponse,HttpStatus.CREATED);
+        ReviewDto review = reviewService.createReview(reviewDto);
+        return new ResponseEntity<>(review,HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
@@ -48,5 +40,18 @@ public class ReviewController {
         reviewService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @RolesAllowed("USER")
+    @GetMapping("/utilisateur")
+    public ResponseEntity<List<ReviewDto>> getAllReviewByUtilisateur(Principal principal){
+        return ResponseEntity.ok().body(reviewService.getAllByUtilisateur(principal.getName()));
+    }
+
+    @GetMapping("/logement/{id}")
+    public ResponseEntity<List<ReviewDto>> getAllReviewByLogement(@PathVariable(name = "id") Long id){
+        return ResponseEntity.ok().body(reviewService.getAllByLogement(id));
+    }
+
+
 
 }

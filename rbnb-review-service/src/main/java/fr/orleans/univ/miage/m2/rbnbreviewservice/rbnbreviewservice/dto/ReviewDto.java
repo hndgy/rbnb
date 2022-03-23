@@ -8,10 +8,7 @@ import java.util.Date;
 public class ReviewDto {
     private long id;
     private String contenu;
-    private String idReservation;
     private Date date;
-    private int note;
-    private Long idLogement;
-    private Long idUtilisateur;
-    private String nomUtilisateur;
+    private LogementDto logement;
+    private UtilisateurDto utilisateur;
 }

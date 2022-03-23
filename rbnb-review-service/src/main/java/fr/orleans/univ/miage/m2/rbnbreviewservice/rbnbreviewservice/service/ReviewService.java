@@ -5,20 +5,18 @@ import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.entity.Revie
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.exception.ReviewNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.naming.ServiceUnavailableException;
 import java.util.List;
 
-@Service
 public interface ReviewService {
 
-    Review createReview(Review review);
+    ReviewDto createReview(ReviewDto reviewDto);
 
-    List<Review> getAllByLogement(Long idLogement);
+    List<ReviewDto> getAllByLogement(Long idLogement);
 
-    List<Review> getAllByUtilisateur(Long idUtilisateur);
-
-    List<Review> getAllByReservation(String idReservation);
+    List<ReviewDto> getAllByUtilisateur(String idUtilisateur);
 
     void deleteById(Long id) throws ReviewNotFoundException;
 
-    Review getReviewById(Long id) throws ReviewNotFoundException;
+    ReviewDto getReviewById(Long id) throws ReviewNotFoundException;
 }
