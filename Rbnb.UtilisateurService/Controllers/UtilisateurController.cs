@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Rbnb.UtilisateuService.Dtos;
 using Rbnb.UtilisateuService.Entities;
 using Rbnb.UtilisateuService.Models;
+using Rbnb.UtilisateuService.Services;
 
 namespace Rbnb.UtilisateuService.Controllers;
 
@@ -11,41 +12,33 @@ namespace Rbnb.UtilisateuService.Controllers;
 [Route("[controller]")]
 public class UtilisateurController : ControllerBase
 {
-    private KeycloakClient _keycloakClient;
+    private IUtilisateurService _utilisateurService;
     private readonly ILogger<UtilisateurController> _logger;
-    private HttpClient _httpClient;
-    private UserServiceDbContext dbContext;
 
-    public UtilisateurController(ILogger<UtilisateurController> logger)
+    public UtilisateurController(ILogger<UtilisateurController> logger, IUtilisateurService utilisateurService)
     {
         _logger = logger;
+        _utilisateurService = utilisateurService;
     }
 
     [HttpGet(Name = "GetAllUser")]
     public IEnumerable<Utilisateur> Get()
     {
-        //return new List<Utilisateur>();
-        return dbContext.Utilisateurs.AsEnumerable();
+        return _utilisateurService.GetAllUtilisateur();
     }
 
     [HttpPost()]
     public async Task<IActionResult> Inscrire(CreationUtilisateurDto dto)
     {
-        if (!dto.CheckPassword())
+        try
         {
-            return BadRequest("Les mots de passe ne sont pas les mêmes");
+            var user = await _utilisateurService.InscrireUtilisateurAsync(dto);
+            return Created("", user);
         }
-        var utilisateurKeycloakResponse = await _keycloakClient.CreateUser(dto);
-
-        if (utilisateurKeycloakResponse.IsSuccessStatusCode)
+        catch (Exception e)
         {
-            Utilisateur utilisateur = Mapper.ConvertCreationUtilisateurDtoToUtilisateur(dto);
-            utilisateur.Id = utilisateurKeycloakResponse.UserId;
-            dbContext.Utilisateurs.Add(utilisateur);
-            dbContext.SaveChanges();
-            return Ok(utilisateur);
+            return BadRequest(e.Message);
         }
-        return BadRequest();
     }
 
     [HttpGet]
@@ -53,12 +46,15 @@ public class UtilisateurController : ControllerBase
     public IActionResult GetById([FromRoute] String id)
     {
 
-        var user = dbContext.Utilisateurs.Where(u => u.Id == id).FirstOrDefault();
-        if (user == null)
+        try
         {
-            return NotFound();
+            var user = _utilisateurService.GetUtilisateurById(id);
+            return Ok(user);
         }
-        return Ok(user);
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
 
