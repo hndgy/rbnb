@@ -50,6 +50,7 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
     {
         super.configure(http);
         http
+                .csrf().disable().cors().and()
                 .authorizeRequests()
                 .anyRequest().permitAll()
         ;
