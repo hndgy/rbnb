@@ -14,5 +14,5 @@ public interface ReservationService {
     Reservation createReservation(Reservation reservation);
     void updateNbVoyageursReservation(String idRerservation, int nbVoyageurs) throws NbVoyagageurIncorrecteException;
     void updateDateReservation(String idReservation, Date dateDebut, Date dateFin) throws LogementsIndisponibleException;
-
+    void annulerReservation(String idReservation);
 }
