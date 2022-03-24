@@ -2,8 +2,13 @@ global using System.ComponentModel.DataAnnotations;
 global using System.ComponentModel.DataAnnotations.Schema;
 global using Microsoft.EntityFrameworkCore;
 using System.Configuration;
+using System.Security.Claims;
 using Consul;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Rbnb.UtilisateuService.Models;
 using Rbnb.UtilisateuService.Services;
 
@@ -19,6 +24,7 @@ builder.Services.AddDbContext<UserServiceDbContext>(
 );
 
 builder.Services.AddScoped<IUtilisateurService, UtilisateurService>();
+builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformer>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -34,31 +40,40 @@ builder.Services.AddSingleton<IConsulClient, ConsulClient>(
 );
 
 
-
+IdentityModelEventSource.ShowPII = true;
 
 builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme =
-JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme =
-JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(o =>
-{
-    o.Authority = "http://localhost:9001/auth/realms/rbnb";//builder.Configuration["keycloak:host"];
-    o.Audience = "rbnb";//builder.Configuration["Keycloak:Audience"];
-    o.RequireHttpsMetadata = false;
-    o.Events = new JwtBearerEvents()
-    {
-        OnAuthenticationFailed = c =>
-        {
-            c.NoResult();
-            c.Response.StatusCode = 500;
-            c.Response.ContentType = "text/plain";
+          {
+              options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+              options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
-            return c.Response.WriteAsync(c.Exception.ToString());
-        }
-    };
-});
+          }).AddJwtBearer(o =>
+          {
+              o.Authority = "http://localhost:9001/auth/realms/rbnb";
+              o.Audience = "rbnb-client";
+              o.RequireHttpsMetadata = false;
+              o.TokenValidationParameters = new TokenValidationParameters
+              {
+                  RoleClaimType = ClaimTypes.Role
+              };
+
+              o.Events = new JwtBearerEvents
+              {
+                  OnAuthenticationFailed = c =>
+                  {
+                      c.NoResult();
+                      c.Response.StatusCode = 500;
+                      c.Response.ContentType = "text/plain";
+
+
+                      return c.Response.WriteAsync("An error occured processing your authentication. " + c.Exception.Message);
+                  }
+              };
+          });
+
+builder.Services.AddCors();
+
+
 var app = builder.Build();
 
 var consulClient = app.Services.GetRequiredService<IConsulClient>();
@@ -72,6 +87,7 @@ var registration = new AgentServiceRegistration()
     Name = builder.Configuration["consul:name"], // servie name 
     Address = builder.Configuration["consul:address"], //$"{uri.Host}",
     Port = Int32.Parse(builder.Configuration["consul:port"])  // uri.Port
+
 };
 
 logger.LogInformation("Registering with Consul");
@@ -92,10 +108,32 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+
+public class ClaimsTransformer : IClaimsTransformation
+{
+    public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
+    {
+        var claimsIdentity = (ClaimsIdentity)principal.Identity;
+        // flatten realm_access because Microsoft identity model doesn't support nested claims
+        // by map it to Microsoft identity model, because automatic JWT bearer token mapping already processed here
+        if (claimsIdentity.IsAuthenticated && claimsIdentity.HasClaim(claim => claim.Type == "realm_access"))
+        {
+            var realmAccessClaim = claimsIdentity.FindFirst(claim => claim.Type == "realm_access");
+            var realmAccessAsDict = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(realmAccessClaim.Value);
+            if (realmAccessAsDict["roles"] != null)
+            {
+                foreach (var role in realmAccessAsDict["roles"])
+                {
+                    claimsIdentity.AddClaim(new Claim(claimsIdentity.RoleClaimType, role));
+                }
+            }
+        }
+        return Task.FromResult(principal);
+    }
+}

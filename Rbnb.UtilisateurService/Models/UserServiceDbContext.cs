@@ -19,7 +19,7 @@ public class UserServiceDbContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            var connectionString = "Server=localhost;Port=3306;Database=UtilisateurService;User=user;Password=1234";
+            var connectionString = "Server=localhost;Port=3307;Database=UtilisateurService;User=user;Password=1234";
             optionsBuilder.UseMySql(
                 connectionString,
                 ServerVersion.AutoDetect(connectionString)

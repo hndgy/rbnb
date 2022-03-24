@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Rbnb.UtilisateuService.Dtos;
@@ -53,11 +54,9 @@ public class UtilisateurController : ControllerBase
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return NotFound(e.Message);
         }
     }
-
-
 
 
 }

@@ -5,12 +5,12 @@ services:
     ports:
       - 8500:8500
 
-  utilisateur-service:
-    build: ./utilisateur-service
-    ports:
-      - "9001:80"
-    depends_on:
-      - mysql-utilisateur-service
+  # utilisateur-service:
+  #   build: ./Rbnb.UtilisateurService
+  #   ports:
+  #     - "9002:80"
+  #   depends_on:
+  #     - mysql-utilisateur-service
   mysql-utilisateur-service:
     image: mysql
     restart: always
@@ -24,39 +24,38 @@ services:
       MYSQL_ROOT_PASSWORD: 'p'
     ports:
       # <Port exposed> : < MySQL Port running inside container>
-      - '3306:3306'
+      - '3307:3306'
     expose:
       # Opens port 3306 on the container
-      - '3306'
+      - '3307'
       # Where our data will be persisted
     volumes:
       - ./dump/onstart-utlisateur-service-mysql.sql:/docker-entrypoint-initdb.d/create.sql
+
   keycloak:
     image: jboss/keycloak
-    ports:
-      - 8080:8080
-    volumes:
-      - ./dump/realm-export.json:/opt/jboss/keycloak/imports
-    command:
-      - "-b 0.0.0.0 -Dkeycloak.import=/opt/jboss/keycloak/imports/realm-export.json"
     environment:
-      DB_VENDOR: mysql
-      DB_ADDR: mysql
-      DB_USER: keycloak
-      DB_PASSWORD: keycloak
-      DB_PORT: 3306
-      DB_DATABASE: keycloak
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
-    depends_on:
-      - mysql
-
-  mysql:
-    image: mysql:8.0.20
-    environment:
-      MYSQL_ROOT_PASSWORD: p
-      MYSQL_USER: keycloak
-      MYSQL_PASSWORD: keycloak
-      MYSQL_DATABASE: keycloak
+      # DB_ADDR: mysql-keycloak
+      #DB_USER: keycloak
+      #DB_PASSWORD: keycloak
+      #DB_PORT: 3307
+      #DB_DATABASE: keycloak
+      #KEYCLOAK_IMPORT: /tmp/export-realm.json
     ports:
-      - 3307:3306
+      - "9001:8080"
+    #volumes:
+    # - ../dump/export-realm.json:/tmp/export-realm.json
+    #depends_on:
+    #  - mysql-keycloak
+
+    #  mysql-keycloak:
+    #    image: mysql
+    #    environment:
+    #      MYSQL_ROOT_PASSWORD: admin
+    #      MYSQL_USER: keycloak
+    #      MYSQL_PASSWORD: keycloak
+    #      MYSQL_DATABASE: keycloak
+    #    ports:
+    #      - "3307:3306"
