@@ -47,37 +47,41 @@ public class LogementController {
         }
     }
 
-    @RolesAllowed("ADMIN")
+    @RolesAllowed("HOTE")
     @PostMapping
     public ResponseEntity<Logement> createOrUpdateLogement(
             Principal principal,
-            @RequestBody CreationLogementDto logementDto
+            @RequestBody CreationLogementDto creationLogementDto
     )
     {
         String idProprietaire = principal.getName();
-        List<Equipement> equipements = logementDto
+        List<Equipement> equipements = creationLogementDto
                 .idEquipements()
                 .stream()
                 .map(
                         id -> logementService.getEquipementById(id)
                 ).collect(Collectors.toList());
-        List<Categorie> categories = logementDto
+        List<Categorie> categories = creationLogementDto
                 .idCategories()
                 .stream()
                 .map(
                         id -> logementService.getCategorieById(id)
-                ).toList();
+                ).collect(Collectors.toList());
 
 
         Logement logement = new Logement();
         logement.setIdProprietaire(idProprietaire);
-        logement.setLibelle(logementDto.libelle());
-        logement.setAddress(logementDto.address());
+        logement.setLibelle(creationLogementDto.libelle());
+        logement.setAddress(creationLogementDto.address());
         logement.setEquipements(equipements);
         logement.setCategories(categories);
 
         Logement updated = logementService.createOrUpdateLogement(logement);
         return new ResponseEntity<>(updated, new HttpHeaders(), HttpStatus.OK);
     }
+
+
+    //@TODO find par idProprietaire
+
 
 }

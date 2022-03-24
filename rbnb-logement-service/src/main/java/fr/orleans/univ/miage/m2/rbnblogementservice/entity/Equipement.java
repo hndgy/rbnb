@@ -20,7 +20,7 @@ public class Equipement {
     @Column(name = "id_equipement", nullable = false)
     private Long idEquipement;
 
-    @Column(name = "name")
+    @Column(name = "nom")
     private String nom;
 
 }
