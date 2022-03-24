@@ -11,4 +11,6 @@ public interface ReservationRepo extends MongoRepository<Reservation, String> {
     Collection<Reservation> findAllReservationsByIdLogement (Long idHost);
 
     Collection<Reservation> findAllReservationsByIdClient(Long idClient);
+
+    Collection<Reservation> findAllReservations();
 }

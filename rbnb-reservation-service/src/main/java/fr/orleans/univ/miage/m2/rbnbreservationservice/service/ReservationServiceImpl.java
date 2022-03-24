@@ -7,11 +7,11 @@ import fr.orleans.univ.miage.m2.rbnbreservationservice.repository.ReservationRep
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.LogementsIndisponibleException;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.NbVoyagageurIncorrecteException;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.ReservationIntrouvableException;
+import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
+@Service
 public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepo reservationRepo;
@@ -82,8 +82,15 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void updateDateReservation(String idReservation, Date dateDebut, Date dateFin) throws LogementsIndisponibleException {
+    public void updateDateReservation(String idReservation, Date dateDebut, Date dateFin) throws LogementsIndisponibleException, ReservationIntrouvableException {
+        Optional<Reservation> reservation2 = reservationRepo.findById(idReservation);
+        Reservation reservation = reservation2.get();
+        reservation.setDateFin(dateFin);
+        reservation.setDateDebut(dateDebut);
 
+        this.annulerReservation(idReservation);
+
+        this.createReservation(reservation);
     }
 
     @Override
@@ -106,5 +113,10 @@ public class ReservationServiceImpl implements ReservationService {
             reservationRepo.deleteById(idReservation);
         }
         else throw new ReservationIntrouvableException();
+    }
+
+    @Override
+    public Reservation getReservationsByIdReservation(String idReservation) {
+        return reservationRepo.findById(idReservation).get();
     }
 }
