@@ -10,7 +10,7 @@ services:
     ports:
       - "9002:80"
     environment:
-      - ConnectionStrings_DefaultConnection=Server=localhost;Port=3307;Database=UtilisateurService;User=user;Password=1234
+      - ConnectionStrings_DefaultConnection=Server=mysql-utilisateur-service;Port=3307;Database=UtilisateurService;User=user;Password=1234
       - consul_name=rbnb-utilisateur-service
       - consul_host=utilisateur-service
       - consul_port=9002
