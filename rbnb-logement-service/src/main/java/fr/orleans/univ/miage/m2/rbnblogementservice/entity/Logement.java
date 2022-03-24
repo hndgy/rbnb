@@ -29,10 +29,10 @@ public class Logement {
     @Column(name = "proprietaire_id")
     private String idProprietaire;
 
-    @OneToMany
+    @ManyToMany
     private List<Equipement> equipements;
 
-    @OneToMany
+    @ManyToMany
     private List<Categorie> categories;
 
 //    @Column(name = "images")

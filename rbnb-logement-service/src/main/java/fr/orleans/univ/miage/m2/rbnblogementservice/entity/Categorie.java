@@ -21,7 +21,7 @@ public class Categorie {
     @Column(name = "id_categorie", nullable = false)
     private Long idCategorie;
 
-    @Column(name = "name")
+    @Column(name = "nom")
     private String nom;
 
 }
