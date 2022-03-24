@@ -32,8 +32,42 @@ public class LogementController {
         List<Logement> logementList = null;
         logementList = logementService.getAllLogements();
         return new ResponseEntity<>(logementList, new HttpHeaders(), HttpStatus.OK);
-
     }
+
+    @RolesAllowed("HOTE")
+    @PostMapping
+    public ResponseEntity<Logement> createLogement(
+            Principal principal,
+            @RequestBody CreationLogementDto creationLogementDto
+    )
+    {
+        String idProprietaire = principal.getName();
+        List<Equipement> equipements = creationLogementDto
+                .idEquipements()
+                .stream()
+                .map(
+                        id -> logementService.getEquipementById(id)
+                ).collect(Collectors.toList());
+        List<Categorie> categories = creationLogementDto
+                .idCategories()
+                .stream()
+                .map(
+                        id -> logementService.getCategorieById(id)
+                ).collect(Collectors.toList());
+
+
+        Logement logement = new Logement();
+        logement.setIdProprietaire(idProprietaire);
+        logement.setLibelle(creationLogementDto.libelle());
+        logement.setAddress(creationLogementDto.address());
+        logement.setNbVoyageurs(creationLogementDto.nbVoyageurs());
+        logement.setEquipements(equipements);
+        logement.setCategories(categories);
+
+        Logement nouveauLogement = logementService.createOrUpdateLogement(logement);
+        return new ResponseEntity<>(nouveauLogement, new HttpHeaders(), HttpStatus.CREATED);
+    }
+
 
     @RolesAllowed({"HOTE","USER"})
     @GetMapping("/{idLogement}")
@@ -94,8 +128,15 @@ public class LogementController {
 
             Logement updateLogement = new Logement();
             updateLogement.setId(idLogement);
-            updateLogement.setLibelle(creationLogementDto.libelle());
-            updateLogement.setAddress(creationLogementDto.address());
+            if (creationLogementDto.libelle() != null) {
+                updateLogement.setLibelle(creationLogementDto.libelle());
+            }
+            if (creationLogementDto.address() != null) {
+                updateLogement.setAddress(creationLogementDto.address());
+            }
+            if (creationLogementDto.nbVoyageurs() != 0) {
+                updateLogement.setNbVoyageurs(creationLogementDto.nbVoyageurs());
+            }
             updateLogement.setIdProprietaire(idProprietaire);
             updateLogement.setEquipements(equipements);
             updateLogement.setCategories(categories);
@@ -119,38 +160,6 @@ public class LogementController {
         }
     }
 
-    @RolesAllowed("HOTE")
-    @PostMapping
-    public ResponseEntity<Logement> createLogement(
-            Principal principal,
-            @RequestBody CreationLogementDto creationLogementDto
-    )
-    {
-        String idProprietaire = principal.getName();
-        List<Equipement> equipements = creationLogementDto
-                .idEquipements()
-                .stream()
-                .map(
-                        id -> logementService.getEquipementById(id)
-                ).collect(Collectors.toList());
-        List<Categorie> categories = creationLogementDto
-                .idCategories()
-                .stream()
-                .map(
-                        id -> logementService.getCategorieById(id)
-                ).collect(Collectors.toList());
-
-
-        Logement logement = new Logement();
-        logement.setIdProprietaire(idProprietaire);
-        logement.setLibelle(creationLogementDto.libelle());
-        logement.setAddress(creationLogementDto.address());
-        logement.setEquipements(equipements);
-        logement.setCategories(categories);
-
-        Logement nouveauLogement = logementService.createOrUpdateLogement(logement);
-        return new ResponseEntity<>(nouveauLogement, new HttpHeaders(), HttpStatus.CREATED);
-    }
 
 
     //@TODO find par idProprietaire

@@ -10,6 +10,7 @@ import java.util.Set;
 public record CreationLogementDto(
         String libelle,
         String address,
+        int nbVoyageurs,
         Set<Image> images,
         List<Long> idEquipements,
         List<Long> idCategories

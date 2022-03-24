@@ -18,6 +18,7 @@ import java.util.Set;
 public record LogementDto(
         String libelle,
         String address,
+        int nbVoyageurs,
         Set<Image> images,
         List<Equipement> equipements,
         List<Categorie> categories
