@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -14,7 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Review")
+@Table(name = "review")
 public class Review {
 
     @Id
@@ -23,14 +24,15 @@ public class Review {
 
     private String contenu;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date date;
 
     private String idUtilisateur;
 
     private Long idLogement;
 
-//    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true)
-//    private Collection<Notation> notations;
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true)
+    private Collection<Notation> notations;
 
 }
 
