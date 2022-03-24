@@ -39,7 +39,8 @@ public class LogementServiceImpl implements LogementService {
                 nouveauLogement.setLibelle(entity.getLibelle());
                 nouveauLogement.setAddress(entity.getAddress());
                 nouveauLogement.setIdProprietaire(entity.getIdProprietaire());
-//                nouveauLogement.setCategories(entity.getCategories());
+                nouveauLogement.setCategories(entity.getCategories());
+                nouveauLogement.setEquipements(entity.getEquipements());
 
                 nouveauLogement = logementRepository.save(nouveauLogement);
                 return nouveauLogement;
