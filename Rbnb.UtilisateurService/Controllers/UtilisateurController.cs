@@ -29,6 +29,7 @@ public class UtilisateurController : ControllerBase
         return _utilisateurService.GetAllUtilisateur();
     }
 
+    [AllowAnonymous]
     [HttpPost()]
     public async Task<IActionResult> Inscrire(CreationUtilisateurDto dto)
     {

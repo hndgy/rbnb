@@ -8,14 +8,14 @@ namespace Rbnb.UtilisateuService.Services;
 public class UtilisateurService : IUtilisateurService
 {
     public KeycloakClient _keycloakClient { get; private set; }
-    public UserServiceDbContext dbContext { get; private set; }
+    public UserServiceDbContext _dbContext { get; private set; }
 
-    public UtilisateurService(IConfiguration config)
+    public UtilisateurService(IConfiguration config, UserServiceDbContext dbContext)
     {
 
         _keycloakClient = new KeycloakClient(config);
 
-        dbContext = new UserServiceDbContext();
+        _dbContext = dbContext;
     }
 
     public async Task<Utilisateur> InscrireUtilisateurAsync(CreationUtilisateurDto dto)
@@ -31,8 +31,8 @@ public class UtilisateurService : IUtilisateurService
         {
             Utilisateur utilisateur = Mapper.ConvertCreationUtilisateurDtoToUtilisateur(dto);
             utilisateur.Id = utilisateurKeycloakResponse.UserId;
-            dbContext.Utilisateurs.Add(utilisateur);
-            dbContext.SaveChanges();
+            _dbContext.Utilisateurs.Add(utilisateur);
+            _dbContext.SaveChanges();
             return utilisateur;
         }
         throw new UtilisateurNonCreeException();
@@ -41,7 +41,7 @@ public class UtilisateurService : IUtilisateurService
 
     public Utilisateur GetUtilisateurById(string id)
     {
-        var user = dbContext.Utilisateurs.Where(u => u.Id == id).FirstOrDefault();
+        var user = _dbContext.Utilisateurs.Where(u => u.Id == id).FirstOrDefault();
         if (user == null)
         {
             throw new UtilisateurNonTrouveException();
@@ -51,6 +51,6 @@ public class UtilisateurService : IUtilisateurService
 
     public IEnumerable<Utilisateur> GetAllUtilisateur()
     {
-        return dbContext.Utilisateurs.AsEnumerable();
+        return _dbContext.Utilisateurs.AsEnumerable();
     }
 }

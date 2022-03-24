@@ -5,25 +5,34 @@ namespace Rbnb.UtilisateuService.Models;
 public class UserServiceDbContext : DbContext
 {
 
+
+
     public UserServiceDbContext()
     {
     }
+
     public UserServiceDbContext(DbContextOptions<UserServiceDbContext> options)
         : base(options)
     {
+
     }
+
+
 
     public DbSet<Utilisateur> Utilisateurs { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
+    /*
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var connectionString = "Server=localhost;Port=3307;Database=UtilisateurService;User=user;Password=1234";
-            optionsBuilder.UseMySql(
-                connectionString,
-                ServerVersion.AutoDetect(connectionString)
-            );
+            if (!optionsBuilder.IsConfigured)
+            {
+
+                var connectionString = "Server=localhost;Port=3307;Database=UtilisateurService;User=user;Password=1234";
+                optionsBuilder.UseMySql(
+                    connectionString,
+                    ServerVersion.AutoDetect(connectionString)
+                );
+            }
         }
-    }
+        */
 }

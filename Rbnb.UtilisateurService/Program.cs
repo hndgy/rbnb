@@ -13,13 +13,17 @@ using Rbnb.UtilisateuService.Models;
 using Rbnb.UtilisateuService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+System.Console.WriteLine("Setting up the dbcontext with : " + builder.Configuration["ConnectionStrings:DefaultConnection"]);
 
 // Add services to the container.
 builder.Services.AddDbContext<UserServiceDbContext>(
     options =>
     {
-        var conString = "server=localhost;database=UtilisateurService;port=3307;user=user;password=1234";//builder.Configuration["ConnectionStrings:DefaultConnection"];
-        options.UseMySql(conString, ServerVersion.AutoDetect(builder.Configuration["ConnectionStrings:DefaultConnection"]));
+        var conString = builder.Configuration["ConnectionStrings:DefaultConnection"];
+        System.Console.WriteLine("Setting up the dbcontext with : " + conString);
+
+        options.UseMySql(conString, ServerVersion.AutoDetect(conString));
+
     }
 );
 
@@ -48,8 +52,8 @@ builder.Services.AddAuthentication(options =>
 
           }).AddJwtBearer(o =>
           {
-              o.Authority = "http://localhost:9001/auth/realms/rbnb";
-              o.Audience = "rbnb-client";
+              o.Authority = builder.Configuration["keycloak:host"] + "/auth/realms/" + builder.Configuration["keycloak:realm"];
+              o.Audience = builder.Configuration["keycloak:client"];
               o.RequireHttpsMetadata = false;
               o.TokenValidationParameters = new TokenValidationParameters
               {
