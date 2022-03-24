@@ -1,13 +1,11 @@
 package fr.orleans.univ.miage.m2.rbnblogementservice.controller;
 
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.CreationLogementDto;
-import fr.orleans.univ.miage.m2.rbnblogementservice.dto.LogementDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Categorie;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Equipement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Logement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.exception.LogementNotFoundException;
 import fr.orleans.univ.miage.m2.rbnblogementservice.service.LogementService;
-import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -68,6 +66,47 @@ public class LogementController {
         }
     }
 
+
+    @RolesAllowed("HOTE")
+    @PutMapping("/{idLogement}")
+    public ResponseEntity<Object> updateLogement(
+            Principal principal,
+            @PathVariable Long idLogement,
+            @RequestBody CreationLogementDto creationLogementDto
+    ) throws LogementNotFoundException
+    {
+        Optional<Logement> logement = logementService.getLogementById(idLogement);
+        String idProprietaire = logement.get().getIdProprietaire();
+        if (Objects.equals(principal.getName(), idProprietaire))
+        {
+            List<Equipement> equipements = creationLogementDto
+                    .idEquipements()
+                    .stream()
+                    .map(
+                            id -> logementService.getEquipementById(id)
+                    ).collect(Collectors.toList());
+            List<Categorie> categories = creationLogementDto
+                    .idCategories()
+                    .stream()
+                    .map(
+                            id -> logementService.getCategorieById(id)
+                    ).collect(Collectors.toList());
+
+            Logement updateLogement = new Logement();
+            updateLogement.setId(idLogement);
+            updateLogement.setLibelle(creationLogementDto.libelle());
+            updateLogement.setAddress(creationLogementDto.address());
+            updateLogement.setIdProprietaire(idProprietaire);
+            updateLogement.setEquipements(equipements);
+            updateLogement.setCategories(categories);
+            logementService.createOrUpdateLogement(updateLogement);
+            return new ResponseEntity<>(updateLogement, new HttpHeaders(), HttpStatus.OK);
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
     @RolesAllowed({"ADMIN","HOTE"})
     @GetMapping("/proprietaire")
     public ResponseEntity<List<Logement>> getLogementsByProprietaire(@RequestParam String idProprietaire){
@@ -82,7 +121,7 @@ public class LogementController {
 
     @RolesAllowed("HOTE")
     @PostMapping
-    public ResponseEntity<Logement> createOrUpdateLogement(
+    public ResponseEntity<Logement> createLogement(
             Principal principal,
             @RequestBody CreationLogementDto creationLogementDto
     )
@@ -109,8 +148,8 @@ public class LogementController {
         logement.setEquipements(equipements);
         logement.setCategories(categories);
 
-        Logement updated = logementService.createOrUpdateLogement(logement);
-        return new ResponseEntity<>(updated, new HttpHeaders(), HttpStatus.OK);
+        Logement nouveauLogement = logementService.createOrUpdateLogement(logement);
+        return new ResponseEntity<>(nouveauLogement, new HttpHeaders(), HttpStatus.CREATED);
     }
 
 

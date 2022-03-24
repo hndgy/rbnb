@@ -18,7 +18,6 @@ public class Categorie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_categorie", nullable = false)
     private Long idCategorie;
 
     @Column(name = "nom")
