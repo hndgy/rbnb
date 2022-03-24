@@ -3,7 +3,8 @@ package fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto;
 import lombok.Data;
 
 @Data
-public class LogementDto {
+public class NotationDto {
     private long id;
-    private String libelle;
+    private int etoile;
+    private long idPrestation;
 }

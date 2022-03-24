@@ -12,7 +12,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Notation")
+@Table(name = "notation")
 public class Notation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,8 +22,11 @@ public class Notation {
     private int etoile;
 
     @ManyToOne
-    @JoinColumn(name = "prestation_ID")
+    @JoinColumn(name = "prestation_id")
     private Prestation prestation;
 
+    @ManyToOne
+    @JoinColumn(name = "review_id", referencedColumnName="id")
+    private Review review;
 
 }
