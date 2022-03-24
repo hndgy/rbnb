@@ -31,7 +31,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-
 builder.Services.AddSingleton<IConsulClient, ConsulClient>(
     p => new ConsulClient(consulConfig =>
     {
@@ -84,8 +83,8 @@ var lifetime = app.Lifetime;
 var registration = new AgentServiceRegistration()
 {
     ID = builder.Configuration["consul:name"], //{uri.Port}"
-    Name = builder.Configuration["consul:name"], // servie name 
-    Address = builder.Configuration["consul:address"], //$"{uri.Host}",
+    Name = builder.Configuration["consul:name"], // servie name
+    Address = builder.Configuration["consul:host"], //$"{uri.Host}",
     Port = Int32.Parse(builder.Configuration["consul:port"])  // uri.Port
 
 };

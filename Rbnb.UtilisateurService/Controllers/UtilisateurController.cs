@@ -22,6 +22,7 @@ public class UtilisateurController : ControllerBase
         _utilisateurService = utilisateurService;
     }
 
+    [Authorize(Roles = "ADMIN")]
     [HttpGet(Name = "GetAllUser")]
     public IEnumerable<Utilisateur> Get()
     {
@@ -38,11 +39,13 @@ public class UtilisateurController : ControllerBase
         }
         catch (Exception e)
         {
+            System.Console.WriteLine(e);
             return BadRequest(e.Message);
         }
     }
 
     [HttpGet]
+    [Authorize(Roles = "USER,HOTE")]
     [Route("{id}")]
     public IActionResult GetById([FromRoute] String id)
     {

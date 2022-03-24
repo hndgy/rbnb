@@ -14,6 +14,8 @@ public class KeycloakClient
         _httpClient = new HttpClient();
         _host = config.GetValue<string>("keycloak:host");
         _reaml = config.GetValue<string>("keycloak:realm");
+
+        System.Console.WriteLine("KeycloakClient init with host=" + _host + " && realm= " + _reaml);
     }
 
     public async Task<String> GetTokenAsync(String clientId, String username, String password)
@@ -38,10 +40,12 @@ public class KeycloakClient
     }
 
 
-    private async Task<bool> ResetPasswordAsync(string idUser, string password)
+    private bool ResetPassword(string idUser, string password, string adminToken)
     {
         _httpClient.DefaultRequestHeaders.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
+
 
         var obj = new
         {
@@ -64,10 +68,50 @@ public class KeycloakClient
         );
         response.Wait();
 
+        System.Console.WriteLine(response.Result.RequestMessage);
         return response.Result.IsSuccessStatusCode;
     }
 
-    private async Task<CreationUtilisateurKeycloakResponse> CreateUserAsync(CreationUtilisateurDto dto, string adminToken)
+    /*
+    => /auth/admin/realms/rbnb/users/fff1c771-5cc5-4db0-ba50-97271d2d242a/role-mappings/realm
+    [{"id":"2e4251db-f8f9-45d4-a029-54bd80eeec2f","name":"USER","composite":false,"clientRole":false,"containerId":"rbnb"}]
+    */
+    private bool AddRole(string idUser, string role, string adminToken)
+    {
+        _httpClient.DefaultRequestHeaders.Clear();
+        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
+
+
+        var obj = new
+        {
+            id = idUser,
+            name = role,
+            composite = false,
+            clientRole = false,
+            containerId = _reaml
+        };
+        var tab = new object[] { obj };
+
+
+        var content = new StringContent(
+            JsonConvert.SerializeObject(tab),
+            Encoding.UTF8,
+            "application/json"
+        );
+
+
+        Console.WriteLine(_host + "/auth/admin/realms/" + _reaml + "/users/" + idUser + "/role-mappings/realm");
+        var response = _httpClient.PostAsync(
+            _host + "/auth/admin/realms/" + _reaml + "/users/" + idUser + "/role-mappings/realm",
+            content
+        );
+        response.Wait();
+        System.Console.WriteLine(response.Result.RequestMessage);
+
+        return response.Result.IsSuccessStatusCode;
+    }
+    private CreationUtilisateurKeycloakResponse CreateUser(CreationUtilisateurDto dto, string adminToken)
     {
         _httpClient.DefaultRequestHeaders.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -82,6 +126,7 @@ public class KeycloakClient
             username = dto.Username
         };
 
+        System.Console.WriteLine(obj);
         var content = new StringContent(
             JsonConvert.SerializeObject(obj),
             Encoding.UTF8,
@@ -115,11 +160,13 @@ public class KeycloakClient
 
         Console.WriteLine("Token admin =" + adminToken);
 
-        var userCreationResponse = await CreateUserAsync(dto, adminToken);
+        var userCreationResponse = CreateUser(dto, adminToken);
 
         if (userCreationResponse.IsSuccessStatusCode)
         {
-            await ResetPasswordAsync(userCreationResponse.UserId, dto.Password);
+            var passwordIsSet = ResetPassword(userCreationResponse.UserId, dto.Password, adminToken);
+            var passwordRole = AddRole(userCreationResponse.UserId, dto.Role, adminToken);
+
         }
         return userCreationResponse;
 

@@ -7,6 +7,7 @@ public class CreationUtilisateurDto
     public String? Username { get; set; }
     public String? Password { get; set; }
     public String? PasswordConfirmation { get; set; }
+    public String? Role { get; set; }
 
     public bool CheckPassword() => Password == PasswordConfirmation;
 }
