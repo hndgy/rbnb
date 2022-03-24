@@ -6,7 +6,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@RepositoryRestResource(path = "disponibilite")
 public interface DisponibiliteRepo extends MongoRepository<Disponibilite, String> {
 
     Disponibilite findByIdLogement(Long idLogement);
