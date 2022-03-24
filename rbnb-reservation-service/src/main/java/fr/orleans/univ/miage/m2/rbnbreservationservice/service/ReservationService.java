@@ -12,7 +12,7 @@ public interface ReservationService {
     Collection<Reservation> getReservationsByHote(Long idHote);
 
     Collection<Reservation> getReservationsByVoyageur(Long idVoyageur);
-    Reservation createReservation(Reservation reservation);
+    Reservation createReservation(Reservation reservation) throws LogementsIndisponibleException;
     void updateNbVoyageursReservation(String idRerservation, int nbVoyageurs) throws NbVoyagageurIncorrecteException, ReservationIntrouvableException;
     void updateDateReservation(String idReservation, Date dateDebut, Date dateFin) throws LogementsIndisponibleException;
     void annulerReservation(String idReservation) throws ReservationIntrouvableException;
