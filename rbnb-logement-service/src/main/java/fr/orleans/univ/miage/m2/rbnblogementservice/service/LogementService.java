@@ -14,7 +14,9 @@ public interface LogementService {
 
     Optional<Logement> getLogementById(Long idLogement) throws LogementNotFoundException;
 
-    List<Logement> getAllLogementsByProprietaire(Long proprietaire) throws LogementNotFoundException;
+    List<Logement> getAllLogementsByIdProprietaire(String proprietaire) throws LogementNotFoundException;
+
+//    Optional<Logement> getLogementByIdProprietaireAndId(String proprietaire, Long idLogement) throws LogementNotFoundException;
 
     List<Logement> findAllLogementByAddress(String address) throws LogementNotFoundException;
 

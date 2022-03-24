@@ -68,13 +68,23 @@ public class LogementServiceImpl implements LogementService {
     }
 
     @Override
-    public List<Logement> getAllLogementsByProprietaire(Long idProprietaire) throws LogementNotFoundException {
+    public List<Logement> getAllLogementsByIdProprietaire(String idProprietaire) throws LogementNotFoundException {
         List<Logement> logements = logementRepository.findLogementsByIdProprietaire(idProprietaire);
         if (logements.isEmpty()) {
             throw new LogementNotFoundException("Logements introuvables pour le propriétaire : " + idProprietaire);
         }
         else return logements;
     }
+
+//
+//    @Override
+//    public Optional<Logement> getLogementByIdProprietaireAndId(String proprietaire, Long idLogement) throws LogementNotFoundException {
+//        Optional<Logement> logement = logementRepository.findLogementByIdProprietaireAndId(proprietaire, idLogement);
+//        if (logement.isPresent()) {
+//            return logement;
+//        }
+//        else throw new LogementNotFoundException("Logements introuvables pour le propriétaire : " + proprietaire);
+//    }
 
     @Override
     public List<Logement> findAllLogementByAddress(String address) throws LogementNotFoundException {

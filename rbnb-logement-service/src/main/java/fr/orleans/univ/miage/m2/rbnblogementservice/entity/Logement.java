@@ -29,6 +29,9 @@ public class Logement {
     @Column(name = "proprietaire_id")
     private String idProprietaire;
 
+//    @Column(name = "nb_voyageurs")
+//    private int nbVoyageurs;
+
     @ManyToMany
     private List<Equipement> equipements;
 

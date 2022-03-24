@@ -7,6 +7,7 @@ import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Equipement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Logement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.exception.LogementNotFoundException;
 import fr.orleans.univ.miage.m2.rbnblogementservice.service.LogementService;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.security.RolesAllowed;
 import java.security.Principal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -42,6 +44,37 @@ public class LogementController {
         try {
             logement = logementService.getLogementById(idLogement);
             return new ResponseEntity<>(logement, new HttpHeaders(), HttpStatus.OK);
+        } catch (LogementNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @RolesAllowed("HOTE")
+    @DeleteMapping("/{idLogement}")
+    public ResponseEntity<Object> deleteLogement(Principal principal, @PathVariable Long idLogement) throws LogementNotFoundException {
+        Optional<Logement> logement = logementService.getLogementById(idLogement);
+        String idProprietaire = logement.get().getIdProprietaire();
+        if (Objects.equals(principal.getName(), idProprietaire))
+        {
+            try {
+                logementService.deleteLogement(idLogement);
+                return ResponseEntity.status(HttpStatus.OK).build();
+            } catch (LogementNotFoundException e) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    @RolesAllowed({"ADMIN","HOTE"})
+    @GetMapping("/proprietaire")
+    public ResponseEntity<List<Logement>> getLogementsByProprietaire(@RequestParam String idProprietaire){
+        List<Logement> logements = null;
+        try {
+            logements = logementService.getAllLogementsByIdProprietaire(idProprietaire);
+            return new ResponseEntity<>(logements, new HttpHeaders(), HttpStatus.OK);
         } catch (LogementNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

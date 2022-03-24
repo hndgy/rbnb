@@ -9,7 +9,8 @@ import java.util.List;
 @Repository
 public interface LogementRepository extends JpaRepository<Logement, Long> {
 
-    List<Logement> findLogementsByIdProprietaire(Long idProprietaire);
+    List<Logement> findLogementsByIdProprietaire(String idProprietaire);
+    Logement findLogementByIdProprietaireAndId(String idProprietaire, Long idLogement);
 
     List<Logement> findLogementsByAddress(String address);
 
