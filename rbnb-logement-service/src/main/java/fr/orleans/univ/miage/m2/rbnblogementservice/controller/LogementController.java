@@ -149,7 +149,7 @@ public class LogementController {
         logement.setCategories(categories);
 
         Logement nouveauLogement = logementService.createOrUpdateLogement(logement);
-        return new ResponseEntity<>(nouveauLogement, new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(nouveauLogement, new HttpHeaders(), HttpStatus.CREATED);
     }
 
 
