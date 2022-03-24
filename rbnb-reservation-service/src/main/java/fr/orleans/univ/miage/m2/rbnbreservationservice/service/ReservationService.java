@@ -8,6 +8,7 @@ import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.Reserv
 import java.util.Collection;
 import java.util.Date;
 
+
 public interface ReservationService {
     Collection<Reservation> getReservationsByHote(Long idHote);
 
