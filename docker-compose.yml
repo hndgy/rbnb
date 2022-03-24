@@ -5,12 +5,23 @@ services:
     ports:
       - 8500:8500
 
-  # utilisateur-service:
-  #   build: ./Rbnb.UtilisateurService
-  #   ports:
-  #     - "9002:80"
-  #   depends_on:
-  #     - mysql-utilisateur-service
+  utilisateur-service:
+    build: ./Rbnb.UtilisateurService
+    ports:
+      - "9002:80"
+    environment:
+      - ConnectionStrings_DefaultConnection=Server=localhost;Port=3307;Database=UtilisateurService;User=user;Password=1234
+      - consul_name=rbnb-utilisateur-service
+      - consul_host=utilisateur-service
+      - consul_port=9002
+      - consul_address=http://discovery:8500
+      - keycloak_host=http://keycloak:9001
+      - keycloak_client=rbnb-client
+    depends_on:
+      - discovery
+      - keycloak
+      - mysql-utilisateur-service
+
   mysql-utilisateur-service:
     image: mysql
     restart: always
@@ -42,20 +53,19 @@ services:
       #DB_PASSWORD: keycloak
       #DB_PORT: 3307
       #DB_DATABASE: keycloak
-      #KEYCLOAK_IMPORT: /tmp/export-realm.json
+      KEYCLOAK_IMPORT: /tmp/export-realm.json
     ports:
       - "9001:8080"
-    #volumes:
-    # - ../dump/export-realm.json:/tmp/export-realm.json
-    #depends_on:
-    #  - mysql-keycloak
-
-    #  mysql-keycloak:
-    #    image: mysql
-    #    environment:
-    #      MYSQL_ROOT_PASSWORD: admin
-    #      MYSQL_USER: keycloak
-    #      MYSQL_PASSWORD: keycloak
-    #      MYSQL_DATABASE: keycloak
-    #    ports:
-    #      - "3307:3306"
+    volumes:
+      - ../dump/export-realm.json:/tmp/export-realm.json
+      #depends_on:
+      #  - mysql-keycloak
+      #  mysql-keycloak:
+      #    image: mysql
+      #    environment:
+      #      MYSQL_ROOT_PASSWORD: admin
+      #      MYSQL_USER: keycloak
+      #      MYSQL_PASSWORD: keycloak
+      #      MYSQL_DATABASE: keycloak
+      #    ports:
+      #      - "3307:3306"
