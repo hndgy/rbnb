@@ -1,15 +1,25 @@
 version: '3.3'
-networks:
-  rbnb-network:
-    driver: bridge
+
 services:
   discovery:
     image: consul:1.9
     ports:
       - 8500:8500
 
+  api-gateway:
+    build:
+      context: ./api-gateway
+    ports:
+      - "9000:9009"
+    environment:
+      - JAVA_TOOL_OPTIONS= -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+    depends_on:
+      - discovery
+      - utilisateur-service
+
   utilisateur-service:
-    build: ./Rbnb.UtilisateurService
+    build:
+      context: ./Rbnb.UtilisateurService
     ports:
       - "9002:80"
     environment:
@@ -24,8 +34,6 @@ services:
       - discovery
       - keycloak
       - mysql-utilisateur-service
-    networks:
-      - rbnb-network
 
   mysql-utilisateur-service:
     image: mysql
@@ -47,36 +55,30 @@ services:
       # Where our data will be persisted
     volumes:
       - ./dump/onstart-utlisateur-service-mysql.sql:/docker-entrypoint-initdb.d/create.sql
-    networks:
-      - rbnb-network
-    network_mode: host
-
-  keycloak:
-    image: jboss/keycloak
-    environment:
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: admin
-      # DB_ADDR: mysql-keycloak
-      #DB_USER: keycloak
-      #DB_PASSWORD: keycloak
-      #DB_PORT: 3307
-      #DB_DATABASE: keycloak
-      KEYCLOAK_IMPORT: /tmp/realm-export.json
-    ports:
-      - "9001:8080"
-    volumes:
-      - ./dump:/tmp
-    networks:
-      - rbnb-network
-      #depends_on:
-      #  - mysql-keycloak
-      #  mysql-keycloak:
-      #    image: mysql
-      #    environment:
-      #      MYSQL_ROOT_PASSWORD: admin
-      #      MYSQL_USER: keycloak
-      #      MYSQL_PASSWORD: keycloak
-      #      MYSQL_DATABASE: keycloak
-      #    ports:
-      #      - "3307:3306"
+  # keycloak:
+  #   image: jboss/keycloak
+  #   environment:
+  #     KEYCLOAK_USER: admin
+  #     KEYCLOAK_PASSWORD: admin
+  #     # DB_ADDR: mysql-keycloak
+  #     #DB_USER: keycloak
+  #     #DB_PASSWORD: keycloak
+  #     #DB_PORT: 3307
+  #     #DB_DATABASE: keycloak
+  #     KEYCLOAK_IMPORT: /tmp/realm-export.json
+  #   ports:
+  #     - "9001:8080"
+  #   volumes:
+  #     - ./dump:/tmp
+  #     #depends_on:
+  #     #  - mysql-keycloak
+  #     #  mysql-keycloak:
+  #     #    image: mysql
+  #     #    environment:
+  #     #      MYSQL_ROOT_PASSWORD: admin
+  #     #      MYSQL_USER: keycloak
+  #     #      MYSQL_PASSWORD: keycloak
+  #     #      MYSQL_DATABASE: keycloak
+  #     #    ports:
+  #     #      - "3307:3306"
 
