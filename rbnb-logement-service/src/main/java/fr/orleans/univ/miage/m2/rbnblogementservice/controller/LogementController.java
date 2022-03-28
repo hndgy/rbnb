@@ -149,8 +149,8 @@ public class LogementController {
     }
 
     @RolesAllowed({"ADMIN","HOTE"})
-    @GetMapping("/proprietaire")
-    public ResponseEntity<List<Logement>> getLogementsByProprietaire(@RequestParam String idProprietaire){
+    @GetMapping("/proprietaire/{idProprietaire}")
+    public ResponseEntity<List<Logement>> getLogementsByProprietaire(@PathVariable String idProprietaire){
         List<Logement> logements = null;
         try {
             logements = logementService.getAllLogementsByIdProprietaire(idProprietaire);
