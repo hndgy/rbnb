@@ -9,11 +9,13 @@ public class KeycloakClient
     private HttpClient _httpClient;
     private String _reaml;
     private String _host;
+    private IConfiguration _config;
     public KeycloakClient(IConfiguration config)
     {
         _httpClient = new HttpClient();
         _host = config.GetValue<string>("keycloak:host");
         _reaml = config.GetValue<string>("keycloak:realm");
+        _config = config;
 
         System.Console.WriteLine("KeycloakClient init with host=" + _host + " && realm= " + _reaml);
     }
@@ -156,7 +158,7 @@ public class KeycloakClient
     }
     public async Task<CreationUtilisateurKeycloakResponse> CreateUser(CreationUtilisateurDto dto)
     {
-        var adminToken = await GetTokenAsync("admin-cli", "admin", "admin");
+        var adminToken = await GetTokenAsync("admin-cli", _config.GetValue<string>("keycloak:username"), _config.GetValue<string>("keycloak:password"));
 
         Console.WriteLine("Token admin =" + adminToken);
 
