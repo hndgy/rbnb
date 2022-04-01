@@ -32,7 +32,6 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationRepo.findAllReservationsByIdClient(idVoyageur);
     }
 
-
     @Override
     public Reservation createReservation(Reservation reservation) throws LogementsIndisponibleException {
         Date dateDebutReservation;

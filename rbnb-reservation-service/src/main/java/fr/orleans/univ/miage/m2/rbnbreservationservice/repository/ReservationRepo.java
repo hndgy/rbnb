@@ -1,10 +1,8 @@
 package fr.orleans.univ.miage.m2.rbnbreservationservice.repository;
 
 import fr.orleans.univ.miage.m2.rbnbreservationservice.entity.Reservation;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
-
 
 import java.util.Collection;
 
@@ -15,5 +13,5 @@ public interface ReservationRepo extends MongoRepository<Reservation, String> {
 
     Collection<Reservation> findAllReservationsByIdClient(Long idClient);
 
-    Collection<Reservation> findAllReservations();
+    //Collection<Reservation> findAllReservations();
 }
