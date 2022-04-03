@@ -87,7 +87,7 @@ services:
         -DMYSQL_PWD=p
     depends_on:
       - discovery
-      - mongo-logement-service
+      - mysql-logement-service
 
   mysql-logement-service:
     image: mysql
@@ -120,8 +120,9 @@ services:
         -MONGO_PW=p
     depends_on:
       - discovery
+      - mongo-reservation-service
 
-  mongo-logement-service:
+  mongo-reservation-service:
     image: mongo
     restart: always
     environment:
@@ -153,6 +154,7 @@ services:
         -DMYSQL_PWD=p
     depends_on:
       - discovery
+      - mysql-review-service
 
   mysql-review-service:
     platform: linux/amd64

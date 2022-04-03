@@ -21,19 +21,34 @@ spring:
           enabled: true
 
       routes:
-        - id: rewritepath_route_monolithique
-          uri: lb://rbnb-monolithique
-          predicates:
-            - Path=/api/mono/**
-          filters:
-            - RewritePath=/api/mono(?<segment>/?.*), /api$\{segment}
-            - PreserveHostHeader
+
         - id: rewritepath_route_utilisateur_service
           uri: lb://rbnb-utilisateur-service
           predicates:
             - Path=/api/utilisateur/**
           filters:
             - RewritePath=/api/utilisateur(?<segment>/?.*), /Utilisateur$\{segment}
+            - PreserveHostHeader
+        - id: rewritepath_route_logement_service
+          uri: lb://rbnb-logement-service
+          predicates:
+            - Path=/api/logement/**
+          filters:
+            - RewritePath=/api/logement(?<segment>/?.*), /api/logement$\{segment}
+            - PreserveHostHeader
+        - id: rewritepath_route_review_service
+          uri: lb://rbnb-review-service
+          predicates:
+            - Path=/api/review/**
+          filters:
+            - RewritePath=/api/review(?<segment>/?.*), /review$\{segment}
+            - PreserveHostHeader
+        - id: rewritepath_route_reservation_service
+          uri: lb://rbnb-reservation-service
+          predicates:
+            - Path=/api/reservation/**
+          filters:
+            - RewritePath=/api/reservation(?<segment>/?.*), /reservation$\{segment}
             - PreserveHostHeader
 server:
   port: 9009
