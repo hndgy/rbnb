@@ -1,5 +1,6 @@
 package fr.orleans.univ.miage.m2.rbnblogementservice.service;
 
+import fr.orleans.univ.miage.m2.rbnblogementservice.dto.LogementDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Categorie;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Equipement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Logement;
@@ -13,6 +14,8 @@ public interface LogementService {
     Logement createOrUpdateLogement(Logement logement);
 
     Optional<Logement> getLogementById(Long idLogement) throws LogementNotFoundException;
+
+    LogementDto getLogementDetailById(Long idLogement) throws LogementNotFoundException;
 
     List<Logement> getAllLogementsByIdProprietaire(String proprietaire) throws LogementNotFoundException;
 

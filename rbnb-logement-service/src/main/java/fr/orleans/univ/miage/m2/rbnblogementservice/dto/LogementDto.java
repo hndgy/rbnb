@@ -19,6 +19,7 @@ public record LogementDto(
         String libelle,
         String address,
         int nbVoyageurs,
+        UtilisateurDto utilisateurDto,
         Set<Image> images,
         List<Equipement> equipements,
         List<Categorie> categories

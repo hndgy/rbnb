@@ -1,5 +1,8 @@
 package fr.orleans.univ.miage.m2.rbnblogementservice.service;
 
+import fr.orleans.univ.miage.m2.rbnblogementservice.controller.LogementController;
+import fr.orleans.univ.miage.m2.rbnblogementservice.dto.LogementDto;
+import fr.orleans.univ.miage.m2.rbnblogementservice.dto.UtilisateurDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Categorie;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Equipement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.repository.CategorieRepository;
@@ -62,6 +65,37 @@ public class LogementServiceImpl implements LogementService {
         Optional<Logement> logement = logementRepository.findById(idLogement);
         if (logement.isPresent()){
             return logementRepository.findById(idLogement);
+        }
+        else {
+            throw new LogementNotFoundException("Logement introuvable pour l'id : " + idLogement);
+        }
+    }
+
+    @Override
+    public LogementDto getLogementDetailById(Long idLogement) throws LogementNotFoundException {
+        Optional<Logement> logement = logementRepository.findById(idLogement);
+        if (logement.isPresent()){
+            Logement logement1 = logementRepository.findById(idLogement).get();
+            String idUtilisateur = logement1.getIdProprietaire();
+            //@TODO requête vers le service utilisateur pour récupérer les infos utilisateur
+            String prenom = "benoit"; //requete prenom
+            String nom = "hote"; //requete nom
+
+            UtilisateurDto utilisateurDto = new UtilisateurDto();
+            utilisateurDto.setId(idUtilisateur);
+            utilisateurDto.setPrenom(prenom);
+            utilisateurDto.setNom(nom);
+
+            LogementDto logementDto = new LogementDto(
+                    logement1.getLibelle(),
+                    logement1.getAddress(),
+                    logement1.getNbVoyageurs(),
+                    utilisateurDto,
+                    logement1.getImages(),
+                    logement1.getEquipements(),
+                    logement1.getCategories()
+            );
+            return logementDto;
         }
         else {
             throw new LogementNotFoundException("Logement introuvable pour l'id : " + idLogement);

@@ -1,6 +1,7 @@
 package fr.orleans.univ.miage.m2.rbnblogementservice.controller;
 
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.CreationLogementDto;
+import fr.orleans.univ.miage.m2.rbnblogementservice.dto.LogementDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Categorie;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Equipement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Logement;
@@ -26,7 +27,7 @@ public class LogementController {
     @Autowired
     LogementService logementService;
 
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"ADMIN","USER"})
     @GetMapping
     public ResponseEntity<List<Logement>> getAllLogement(){
         List<Logement> logementList = null;
@@ -71,10 +72,10 @@ public class LogementController {
 
     @RolesAllowed({"HOTE","USER"})
     @GetMapping("/{idLogement}")
-    public ResponseEntity<Optional<Logement>> getLogement(@PathVariable Long idLogement){
-        Optional<Logement> logement = null;
+    public ResponseEntity<LogementDto> getLogement(@PathVariable Long idLogement){
+        LogementDto logement = null;
         try {
-            logement = logementService.getLogementById(idLogement);
+            logement = logementService.getLogementDetailById(idLogement);
             return new ResponseEntity<>(logement, new HttpHeaders(), HttpStatus.OK);
         } catch (LogementNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

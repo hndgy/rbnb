@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -38,8 +39,8 @@ public class Logement {
     @ManyToMany
     private List<Categorie> categories;
 
-//    @Column(name = "images")
-//    @OneToMany(mappedBy = "logement")
-//    private Set<Image> images;
+    @Column(name = "images")
+    @OneToMany(mappedBy = "logement")
+    private Set<Image> images;
 
 }
