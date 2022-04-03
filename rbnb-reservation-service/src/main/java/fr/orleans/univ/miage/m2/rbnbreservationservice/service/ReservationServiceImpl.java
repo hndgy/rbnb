@@ -1,5 +1,6 @@
 package fr.orleans.univ.miage.m2.rbnbreservationservice.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.dto.LogementDTO;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.dto.ReservationDTO;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.entity.Disponibilite;
@@ -10,11 +11,14 @@ import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.Capaci
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.LogementsIndisponibleException;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.NbVoyagageurIncorrecteException;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.ReservationIntrouvableException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.security.Principal;
 import java.util.*;
+import java.util.stream.Collectors;
+
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -30,26 +34,48 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Collection<Reservation> getReservationsByHote(Long idHote) { //TODO : Ptdrrrrr jamais de la vie ça fonctionne
+    public HashMap<LogementDTO, Collection<Reservation>> getReservationsByHote(Long idHote) throws ReservationIntrouvableException { //TODO : Ptdrrrrr jamais de la vie ça fonctionne
         String urlLogements = "http://rbnb-logement-service/logement/"+ idHote;
         //Collection<LogementDTO> logements  = restTemplate.getForObject(urlLogements, LogementDTO.class);
-        LogementDTO[] logements = restTemplate.getForObject(urlLogements, LogementDTO[].class);
+        //LogementDTO[] logements = restTemplate.getForObject(urlLogements, LogementDTO[].class);
 
-        Collection<Reservation> reservationsLogement = new ArrayList<>();
-        Collection<Reservation> reservations = new ArrayList<>();
+        ResponseEntity<LogementDTO[]> responseEntity =
+                restTemplate.getForEntity(urlLogements, LogementDTO[].class);
+
+        LogementDTO[] logements = responseEntity.getBody();
+
+        ObjectMapper mapper = new ObjectMapper();
 
         assert logements != null;
-        for (LogementDTO logementDTO : logements
+        Collection<LogementDTO> logementDTOS = Arrays.stream(logements)
+                .map(logementDTO -> mapper.convertValue(logementDTO, LogementDTO.class))
+                .collect(Collectors.toList());
+
+
+        Collection<Reservation> reservationsLogement = new ArrayList<>();
+        HashMap<LogementDTO, Collection<Reservation>> reservations = new HashMap<>();
+
+        for (LogementDTO logementDTO : logementDTOS
              ) {
             reservationsLogement =  reservationRepo.findAllReservationsByIdLogement(logementDTO.getIdLogement());
-            reservations.addAll(reservationsLogement);
+            reservations.put(logementDTO,reservationsLogement);
+            //reservations.addAll(reservationsLogement);
         }
-        return reservations;
+        if (reservations.isEmpty()) {
+            throw new ReservationIntrouvableException();
+        }
+        else {
+            return reservations;
+        }
     }
 
     @Override
-    public Collection<Reservation> getReservationsByVoyageur(Long idVoyageur) {
-        return reservationRepo.findAllReservationsByIdClient(idVoyageur);
+    public Collection<Reservation> getReservationsByVoyageur(Long idVoyageur) throws ReservationIntrouvableException {
+        Collection<Reservation> reservations = reservationRepo.findAllReservationsByIdClient(idVoyageur);
+        if (!reservations.isEmpty()) {
+            return reservations;
+        }
+        throw new ReservationIntrouvableException();
     }
 
     @Override
@@ -165,7 +191,11 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Reservation getReservationsByIdReservation(String idReservation) {
-        return reservationRepo.findById(idReservation).get();
+    public Reservation getReservationsByIdReservation(String idReservation) throws ReservationIntrouvableException {
+        Optional<Reservation> reservation = reservationRepo.findById(idReservation);
+        if (reservation.isPresent()) {
+            return reservation.get();
+        }
+        throw new ReservationIntrouvableException();
     }
 }

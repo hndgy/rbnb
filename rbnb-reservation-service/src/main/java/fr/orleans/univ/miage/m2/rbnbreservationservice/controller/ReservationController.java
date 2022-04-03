@@ -43,11 +43,26 @@ public class ReservationController {
     }
 
 
-
+    @RolesAllowed("USER")
     @GetMapping("/{id}/reservation")
     public ResponseEntity<Object> getReservationsByVoyageur(@PathVariable(name = "id") Long id) {
-        return ResponseEntity.ok().body(reservationService.getReservationsByVoyageur(id));
+        try {
+            return ResponseEntity.ok().body(reservationService.getReservationsByVoyageur(id));
+        } catch (ReservationIntrouvableException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
+
+    @RolesAllowed("USER")
+    @GetMapping("/{id}/reservations")
+    public ResponseEntity<Object> getReservationsByHote(@PathVariable(name = "id") Long id) {
+        try {
+            return ResponseEntity.ok().body(reservationService.getReservationsByHote(id));
+        } catch (ReservationIntrouvableException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
 
     @RolesAllowed("USER")
     @PostMapping("/reservation")
@@ -59,6 +74,17 @@ public class ReservationController {
         }
     }
 
+    @RolesAllowed("USER")
+    @PostMapping("/reservation/{id}")
+    public ResponseEntity<Object> getReservationById(@PathVariable(name = "id") String id) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(reservationService.getReservationsByIdReservation(id));
+        } catch (ReservationIntrouvableException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @RolesAllowed("USER")
     @PutMapping("/reservation/{idReservation}/voyageur")
     public ResponseEntity<Object> updateNbVoyageursReservation(@PathVariable String idReservation, @RequestBody int nbVoyageurs){
         try {
@@ -71,7 +97,7 @@ public class ReservationController {
         }
     }
 
-
+    @RolesAllowed("USER")
     @PutMapping("/reservation/{idReservation}/date")
     public ResponseEntity<Object> updateDateReservation(@PathVariable String idReservation, @RequestBody Date dateDebut, @RequestBody Date dateFin, Principal principal) {
         try {
@@ -86,6 +112,7 @@ public class ReservationController {
         }
     }
 
+    @RolesAllowed("USER")
     @DeleteMapping("/reservation/{idReservation}")
     public ResponseEntity<Object> annulerReservation(@PathVariable String idReservation) {
         try {
