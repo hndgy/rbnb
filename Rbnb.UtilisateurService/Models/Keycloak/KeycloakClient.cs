@@ -125,7 +125,8 @@ public class KeycloakClient
             lastName = dto.Nom,
             email = dto.Mail,
             enabled = true,
-            username = dto.Username
+            username = dto.Username,
+            groups = new string[]{"/"+dto.Role }
         };
 
         System.Console.WriteLine(obj);
