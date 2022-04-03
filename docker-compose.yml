@@ -5,6 +5,12 @@ services:
     image: consul:1.9
     ports:
       - 8500:8500
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: 'rabbitmq'
+    ports:
+        - 15672:15672
+        - 5672:5672
 
   api-gateway:
     build:
@@ -32,7 +38,6 @@ services:
       - keycloak_client=rbnb-client
     depends_on:
       - discovery
-      - keycloak
       - mysql-utilisateur-service
 
   mysql-utilisateur-service:
@@ -55,6 +60,9 @@ services:
       # Where our data will be persisted
     volumes:
       - ./dump/onstart-utlisateur-service-mysql.sql:/docker-entrypoint-initdb.d/create.sql
+
+
+
   # keycloak:
   #   image: jboss/keycloak
   #   environment:

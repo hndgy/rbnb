@@ -9,7 +9,7 @@ import java.util.Collection;
 @Repository
 public interface ReservationRepo extends MongoRepository<Reservation, String> {
 
-    Collection<Reservation> findAllReservationsByIdLogement (Long idHost);
+    Collection<Reservation> findAllReservationsByIdLogement (Long idLogement);
 
     Collection<Reservation> findAllReservationsByIdClient(Long idClient);
 
