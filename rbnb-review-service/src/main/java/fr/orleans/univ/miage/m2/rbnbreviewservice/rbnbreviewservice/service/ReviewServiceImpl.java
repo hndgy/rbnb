@@ -1,7 +1,7 @@
 package fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.service;
 
-import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.LogementDto;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.NotationDto;
+import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.ReviewCreationDto;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.ReviewDto;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.UtilisateurDto;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.entity.Notation;
@@ -9,17 +9,17 @@ import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.entity.Prest
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.entity.Review;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.exception.PrestationNotFoundException;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.exception.ReviewNotFoundException;
+import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.mapper.Mapper;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.repository.NotationRepo;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.repository.PrestationRepo;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.repository.ReviewRepo;
 import org.modelmapper.ModelMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,10 +46,10 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public ReviewDto createReview(ReviewDto reviewDto) {
-        Review review = modelMapper.map(reviewDto, Review.class);
-        reviewRepo.save(review);
-        return modelMapper.map(review, ReviewDto.class);
+    public Review createReview(ReviewCreationDto reviewDto) {
+        Review review = Mapper.reviewCreationToReview(reviewDto);
+        Review saved = reviewRepo.save(review);
+        return saved;
     }
 
     @Override
@@ -81,17 +81,22 @@ public class ReviewServiceImpl implements ReviewService{
 
 
     @Override
-    public ReviewDto getReviewById(Long id) throws ReviewNotFoundException {
+    public ReviewDto getReviewById(Long id, String token) throws ReviewNotFoundException {
        Optional<Review> review = reviewRepo.findById(id);
        if (review.isPresent()){
            Review returnReview = review.get();
-           ReviewDto reviewDto = modelMapper.map(review, ReviewDto.class);
-           String urlUtilisateur = "http://rbnb-utilisateur-service/Utilisateur/"+ returnReview.getIdUtilisateur();
-           String urlLogement = "http://rbnb-logement-service/logement/"+ returnReview.getIdLogement();
-           UtilisateurDto utilisateurDto = restTemplate.getForObject(urlUtilisateur, UtilisateurDto.class);
-           LogementDto logementDto = restTemplate.getForObject(urlLogement, LogementDto.class);
-           reviewDto.setUtilisateur(utilisateurDto);
-           reviewDto.setLogement(logementDto);
+           ReviewDto reviewDto = Mapper.reviewToReviewDto(returnReview);
+           HttpHeaders headers = new HttpHeaders();
+           String[] tokenArray = token.split(" ");
+           headers.set("Accept", "application/json");
+           headers.add("Authorization", "Bearer " + tokenArray[1]);
+           HttpEntity<String> entity = new HttpEntity<>(headers);
+           String urlUtilisateur = "http://localhost:9002/Utilisateur/"+ returnReview.getIdUtilisateur();
+           //String urlLogement = "http://rbnb-logement-service/logement/"+ returnReview.getIdLogement();
+           ResponseEntity<UtilisateurDto> restUtilisateurDto = restTemplate.exchange(urlUtilisateur, HttpMethod.GET, entity, UtilisateurDto.class);
+           //LogementDto logementDto = restTemplate.getForObject(urlLogement, LogementDto.class);
+           reviewDto.setUtilisateur(restUtilisateurDto.getBody());
+           //.setLogement(logementDto);
            return reviewDto;
        }else {
            throw new ReviewNotFoundException(id);

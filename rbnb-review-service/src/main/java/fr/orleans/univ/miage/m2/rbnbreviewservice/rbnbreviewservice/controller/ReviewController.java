@@ -1,7 +1,9 @@
 package fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.controller;
 
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.NotationDto;
+import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.ReviewCreationDto;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.ReviewDto;
+import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.entity.Review;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.exception.PrestationNotFoundException;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.exception.ReviewNotFoundException;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.service.ReviewService;
@@ -26,15 +28,15 @@ public class ReviewController {
 
     @RolesAllowed("ADMIN")
     @GetMapping("/{id}")
-    public ResponseEntity<ReviewDto> getReviewById(@PathVariable(name = "id")Long id) throws ReviewNotFoundException {
-        ReviewDto reviewDto = reviewService.getReviewById(id);
+    public ResponseEntity<ReviewDto> getReviewById(@PathVariable(name = "id")Long id, @RequestHeader(name = "Authorization")String token) throws ReviewNotFoundException {
+        ReviewDto reviewDto = reviewService.getReviewById(id, token);
         return ResponseEntity.ok().body(reviewDto);
     }
 
     @RolesAllowed({"USER", "ADMIN"})
     @PostMapping
-    public ResponseEntity<ReviewDto> createReview(@RequestBody ReviewDto reviewDto){
-        ReviewDto review = reviewService.createReview(reviewDto);
+    public ResponseEntity<Review> createReview(@RequestBody ReviewCreationDto reviewDto){
+        Review review = reviewService.createReview(reviewDto);
         return new ResponseEntity<>(review,HttpStatus.CREATED);
     }
     @RolesAllowed("ADMIN")
@@ -45,7 +47,7 @@ public class ReviewController {
     }
 
     @RolesAllowed("ADMIN")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/prestation/{id}")
     public ResponseEntity<HttpStatus> deletePrestation(@PathVariable(name = "id") Long id) throws PrestationNotFoundException {
         reviewService.deletePrestationById(id);
         return new ResponseEntity<>(HttpStatus.OK);
