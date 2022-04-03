@@ -6,5 +6,5 @@ import lombok.Data;
 public class NotationDto {
     private long id;
     private int etoile;
-    private long idPrestation;
+    private String prestation;
 }

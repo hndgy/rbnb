@@ -7,23 +7,24 @@ services:
     ports:
       - "8500:8500"
 
+
 #docker run --rm -p 8080:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin jboss/keycloak:13.0.1
 
-  keycloak:
-    image: jboss/keycloak:16.0.0
-    environment:
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: admin
-      # DB_ADDR: mysql-keycloak
-      #DB_USER: keycloak
-      #DB_PASSWORD: keycloak
-      #DB_PORT: 3307
-      #DB_DATABASE: keycloak
-      #KEYCLOAK_IMPORT: /tmp/export-realm.json
-    ports:
-      - "9001:8080"
-      #volumes:
-      # - ../dump/export-realm.json:/tmp/export-realm.json
+#  keycloak:
+#    image: jboss/keycloak:16.0.0
+#    environment:
+#      KEYCLOAK_USER: admin
+#      KEYCLOAK_PASSWORD: admin
+#      # DB_ADDR: mysql-keycloak
+#      #DB_USER: keycloak
+#      #DB_PASSWORD: keycloak
+#      #DB_PORT: 3307
+#      #DB_DATABASE: keycloak
+#      KEYCLOAK_IMPORT: /tmp/realm-export.json
+#    ports:
+#      - "9001:8080"
+#    volumes:
+#      - ../dump/:/tmp/
     #depends_on:
     #  - mysql-keycloak
 
@@ -47,3 +48,57 @@ services:
       MYSQL_ROOT_PASSWORD: p
     ports:
       - "3309:3306"
+
+#  review-service:
+#    build: .
+#    ports:
+#      - "9005:80"
+#    environment:
+#      - MYSQL_HOST=mysql-review-service
+#      - MYSQL_USER=root
+#      - MYSQL_PORT=3309:3306
+#      - MYSQL_DB=rbnb-review
+#      - MYSQL_PWD=p
+#      - CONSUL_HOST=discovery
+#      - CONSUL_PORT=8500
+#    depends_on:
+#      - discovery
+#      - mysql-utilisateur-service
+
+  utilisateur-service:
+    build:
+      context: ../Rbnb.UtilisateurService
+    ports:
+      - "9002:80"
+    environment:
+      - ConnectionStrings_DefaultConnection=Server=mysql-utilisateur-service;Port=3307;Database=UtilisateurService;User=user;Password=1234
+      - consul_name=rbnb-utilisateur-service
+      - consul_host=utilisateur-service
+      - consul_port=9002
+      - consul_address=http://discovery:8500
+      - keycloak_host=https://rbnb-keycloak.azurewebsites.net
+      - keycloak_client=rbnb-client
+    depends_on:
+      - discovery
+      - mysql-utilisateur-service
+
+  mysql-utilisateur-service:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'UtilisateurService'
+        # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+        # You can use whatever password you like
+      MYSQL_PASSWORD: '1234'
+        # Password for root access
+      MYSQL_ROOT_PASSWORD: 'p'
+    ports:
+        # <Port exposed> : < MySQL Port running inside container>
+       - '3307:3306'
+    expose:
+        # Opens port 3306 on the container
+      - '3307'
+        # Where our data will be persisted
+    volumes:
+      - ../dump/onstart-utlisateur-service-mysql.sql:/docker-entrypoint-initdb.d/create.sql
