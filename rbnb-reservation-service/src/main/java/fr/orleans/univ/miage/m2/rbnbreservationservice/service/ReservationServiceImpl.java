@@ -1,14 +1,19 @@
 package fr.orleans.univ.miage.m2.rbnbreservationservice.service;
 
+import fr.orleans.univ.miage.m2.rbnbreservationservice.dto.LogementDTO;
+import fr.orleans.univ.miage.m2.rbnbreservationservice.dto.ReservationDTO;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.entity.Disponibilite;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.entity.Reservation;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.repository.DisponibiliteRepo;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.repository.ReservationRepo;
+import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.CapaciteLogementDepasseException;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.LogementsIndisponibleException;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.NbVoyagageurIncorrecteException;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.ReservationIntrouvableException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.security.Principal;
 import java.util.*;
 
 @Service
@@ -16,15 +21,30 @@ public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepo reservationRepo;
     private final DisponibiliteRepo disponibiliteRepo;
+    private final RestTemplate restTemplate;
 
-    public ReservationServiceImpl(ReservationRepo reservationRepo, DisponibiliteRepo disponibiliteRepo) {
+    public ReservationServiceImpl(ReservationRepo reservationRepo, DisponibiliteRepo disponibiliteRepo, RestTemplate restTemplate) {
         this.reservationRepo = reservationRepo;
         this.disponibiliteRepo = disponibiliteRepo;
+        this.restTemplate = restTemplate;
     }
 
     @Override
-    public Collection<Reservation> getReservationsByHote(Long idHote) {
-        return null;
+    public Collection<Reservation> getReservationsByHote(Long idHote) { //TODO : Ptdrrrrr jamais de la vie ça fonctionne
+        String urlLogements = "http://rbnb-logement-service/logement/"+ idHote;
+        //Collection<LogementDTO> logements  = restTemplate.getForObject(urlLogements, LogementDTO.class);
+        LogementDTO[] logements = restTemplate.getForObject(urlLogements, LogementDTO[].class);
+
+        Collection<Reservation> reservationsLogement = new ArrayList<>();
+        Collection<Reservation> reservations = new ArrayList<>();
+
+        assert logements != null;
+        for (LogementDTO logementDTO : logements
+             ) {
+            reservationsLogement =  reservationRepo.findAllReservationsByIdLogement(logementDTO.getIdLogement());
+            reservations.addAll(reservationsLogement);
+        }
+        return reservations;
     }
 
     @Override
@@ -33,11 +53,27 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Reservation createReservation(Reservation reservation) throws LogementsIndisponibleException {
+    public Reservation createReservation(ReservationDTO reservationDTO, Principal principal) throws LogementsIndisponibleException, CapaciteLogementDepasseException {
         Date dateDebutReservation;
         Date dateFinReservation;
         Date dateDebutDispo;
         Date dateFinDispo;
+
+        String urlLogement = "http://rbnb-logement-service/logement/"+ reservationDTO.getIdLogement();
+        LogementDTO logementDto = restTemplate.getForObject(urlLogement, LogementDTO.class);
+
+        assert logementDto != null;
+        if (logementDto.getNbMax()<reservationDTO.getNbVoyageurs()) {
+            throw new CapaciteLogementDepasseException();
+        }
+
+        Reservation reservation = new Reservation();
+        reservation.setNbVoyageurs(reservationDTO.getNbVoyageurs());
+        reservation.setIdLogement(reservationDTO.getIdLogement());
+        reservation.setDateDebut(reservationDTO.getDateDebut());
+        reservation.setDateFin(reservationDTO.getDateFin());
+        reservation.setIdClient(Long.valueOf(principal.getName()));
+
         Collection<Disponibilite> disponibilites = disponibiliteRepo.findAllDispoById((reservation.getIdLogement()));
 
         dateDebutReservation = reservation.getDateDebut();
@@ -70,10 +106,18 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void updateNbVoyageursReservation(String idReservation, int nbVoyageurs) throws NbVoyagageurIncorrecteException, ReservationIntrouvableException {
+    public void updateNbVoyageursReservation(String idReservation, int nbVoyageurs) throws NbVoyagageurIncorrecteException, ReservationIntrouvableException, CapaciteLogementDepasseException {
         Optional<Reservation> reservation;
         reservation = reservationRepo.findById(idReservation);
+
         if (reservation.isPresent()) {
+            String urlLogement = "http://rbnb-logement-service/logement/"+ reservation.get().getIdLogement();
+            LogementDTO logementDto = restTemplate.getForObject(urlLogement, LogementDTO.class);
+
+            assert logementDto != null;
+            if (logementDto.getNbMax()<reservation.get().getNbVoyageurs()) {
+                throw new CapaciteLogementDepasseException();
+            }
             reservation.get().setNbVoyageurs(nbVoyageurs);
             reservationRepo.save(reservation.get());
         }
@@ -81,15 +125,21 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void updateDateReservation(String idReservation, Date dateDebut, Date dateFin) throws LogementsIndisponibleException, ReservationIntrouvableException {
+    public void updateDateReservation(String idReservation, Date dateDebut, Date dateFin, Principal principal) throws LogementsIndisponibleException, ReservationIntrouvableException, CapaciteLogementDepasseException {
         Optional<Reservation> reservation2 = reservationRepo.findById(idReservation);
         Reservation reservation = reservation2.get();
         reservation.setDateFin(dateFin);
         reservation.setDateDebut(dateDebut);
 
+        ReservationDTO reservationDTO = new ReservationDTO();
+        reservationDTO.setNbVoyageurs(reservationDTO.getNbVoyageurs());
+        reservationDTO.setIdLogement(reservationDTO.getIdLogement());
+        reservationDTO.setDateDebut(reservationDTO.getDateDebut());
+        reservationDTO.setDateFin(reservationDTO.getDateFin());
+
         this.annulerReservation(idReservation);
 
-        this.createReservation(reservation);
+        this.createReservation(reservationDTO, principal);
     }
 
     @Override
