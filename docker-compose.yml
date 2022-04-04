@@ -113,7 +113,7 @@ services:
         -DKEYCLOAK_REALM=rbnb
         -DKEYCLOAK_CLIENT=rbnb-client
 
-        -DMONGO_HOST=mongo-logement-service
+        -DMONGO_HOST=mongo-reservation-service
         -DMONGO_PORT=27017
         -MONGO_DB=rbnb-reservation
         -MONGO_USER=admin
