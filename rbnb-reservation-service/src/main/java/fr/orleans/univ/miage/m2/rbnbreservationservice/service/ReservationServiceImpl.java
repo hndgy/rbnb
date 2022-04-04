@@ -33,8 +33,11 @@ public class ReservationServiceImpl implements ReservationService {
         this.restTemplate = restTemplate;
     }
 
+
+    //TODO : methode pour set la dispo
+
     @Override
-    public HashMap<LogementDTO, Collection<Reservation>> getReservationsByHote(Long idHote) throws ReservationIntrouvableException { //TODO : Ptdrrrrr jamais de la vie ça fonctionne
+    public HashMap<LogementDTO, Collection<Reservation>> getReservationsByHote(Long idHote) throws ReservationIntrouvableException { //TODO : Ptdrrrrr jamais de la vie ça fonctionne + manque modifier dto
         String urlLogements = "http://rbnb-logement-service/logement/"+ idHote;
         //Collection<LogementDTO> logements  = restTemplate.getForObject(urlLogements, LogementDTO.class);
         //LogementDTO[] logements = restTemplate.getForObject(urlLogements, LogementDTO[].class);
