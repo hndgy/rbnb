@@ -2,6 +2,7 @@ package fr.orleans.univ.miage.m2.rbnblogementservice.controller;
 
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.CreationLogementDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.LogementDto;
+import fr.orleans.univ.miage.m2.rbnblogementservice.dto.UtilisateurDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Categorie;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Equipement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Logement;
@@ -56,7 +57,6 @@ public class LogementController {
                         id -> logementService.getCategorieById(id)
                 ).collect(Collectors.toList());
 
-
         Logement logement = new Logement();
         logement.setIdProprietaire(idProprietaire);
         logement.setLibelle(creationLogementDto.libelle());
@@ -74,9 +74,19 @@ public class LogementController {
     @GetMapping("/{idLogement}")
     public ResponseEntity<LogementDto> getLogement(@PathVariable Long idLogement){
         LogementDto logement = null;
+        //@TODO récupérer le nom et prénom du proprietaire et les renvoyer via le dto
         try {
+            //@TODO récupérer les infos ici depuis le service utilisateur et les ajouter à l'entité
+            UtilisateurDto utilisateurDto = new UtilisateurDto();
+            //*******************************************************//
+
             logement = logementService.getLogementDetailById(idLogement);
-            return new ResponseEntity<>(logement, new HttpHeaders(), HttpStatus.OK);
+            LogementDto logementDto = new LogementDto(
+                    logement.libelle(), logement.address(), logement.nbVoyageurs(),
+                    utilisateurDto, logement.images(), logement.equipements(),
+                    logement.categories());
+
+            return new ResponseEntity<>(logementDto, new HttpHeaders(), HttpStatus.OK);
         } catch (LogementNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -84,7 +94,8 @@ public class LogementController {
 
     @RolesAllowed("HOTE")
     @DeleteMapping("/{idLogement}")
-    public ResponseEntity<Object> deleteLogement(Principal principal, @PathVariable Long idLogement) throws LogementNotFoundException {
+    public ResponseEntity<Object> deleteLogement(Principal principal, @PathVariable Long idLogement)
+            throws LogementNotFoundException {
         Optional<Logement> logement = logementService.getLogementById(idLogement);
         String idProprietaire = logement.get().getIdProprietaire();
         if (Objects.equals(principal.getName(), idProprietaire))
@@ -161,9 +172,6 @@ public class LogementController {
         }
     }
 
-
-
-    //@TODO find par idProprietaire
 
 
 }
