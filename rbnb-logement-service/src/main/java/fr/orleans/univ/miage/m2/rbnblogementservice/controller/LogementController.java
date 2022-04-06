@@ -1,5 +1,6 @@
 package fr.orleans.univ.miage.m2.rbnblogementservice.controller;
 
+import fr.orleans.univ.miage.m2.rbnblogementservice.configuration.MQConfig;
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.CreationLogementDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.LogementDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.UtilisateurDto;
@@ -8,6 +9,7 @@ import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Equipement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Logement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.exception.LogementNotFoundException;
 import fr.orleans.univ.miage.m2.rbnblogementservice.service.LogementService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,14 +27,24 @@ import java.util.stream.Collectors;
 @RequestMapping("/logement")
 public class LogementController {
 
-    @Autowired
     LogementService logementService;
+
+    private final RabbitTemplate template;
+
+    public LogementController(
+            LogementService logementService,
+            RabbitTemplate template
+    ) {
+        this.logementService = logementService;
+        this.template = template;
+    }
 
     @RolesAllowed({"ADMIN","USER"})
     @GetMapping
     public ResponseEntity<List<Logement>> getAllLogement(){
         List<Logement> logementList = null;
         logementList = logementService.getAllLogements();
+        template.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTING_KEY, logementList);
         return new ResponseEntity<>(logementList, new HttpHeaders(), HttpStatus.OK);
     }
 
