@@ -89,7 +89,7 @@ public class UtilisateurService : IUtilisateurService
             _dbContext.Utilisateurs.Update(utilisateur);
             _dbContext.SaveChanges();
             var message = JsonConvert.SerializeObject( utilisateur);
-            var body = Encoding.UTF8.GetBytes(message);
+            var body = Encoding.UTF8.GetBytes(utilisateur.Id);
             _channel.BasicPublish(exchange: Exchange_Update,
                                     routingKey: "",
                                     basicProperties: null,
@@ -106,7 +106,7 @@ public class UtilisateurService : IUtilisateurService
             _dbContext.Utilisateurs.Remove(user);
             _dbContext.SaveChanges();
             var message = JsonConvert.SerializeObject( user);
-            var body = Encoding.UTF8.GetBytes(message);
+            var body = Encoding.UTF8.GetBytes(user.Id);
 
             _channel.BasicPublish(exchange: Exchange_Remove,
                                     routingKey: "",
