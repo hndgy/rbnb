@@ -26,6 +26,7 @@ public class UtilisateurController : ControllerBase
     [HttpGet(Name = "GetAllUser")]
     public IEnumerable<Utilisateur> Get()
     {
+      
         return _utilisateurService.GetAllUtilisateur();
     }
 
@@ -60,6 +61,49 @@ public class UtilisateurController : ControllerBase
         {
             return NotFound(e.Message);
         }
+    }
+
+
+    [HttpPut]
+    [Authorize(Roles = "USER,HOTE")]
+    [Route("{id}")]
+    public IActionResult Update([FromRoute] String id, Utilisateur utilisateur)
+    {
+        foreach(var c in HttpContext.User.Claims){
+            System.Console.WriteLine(c.Value);
+        }
+        try{
+            _utilisateurService.UpdateUtilisateur(utilisateur);
+            return Ok();
+        }catch(Exception e){
+            return BadRequest(e.Message);
+        }
+       
+    }
+
+    [HttpDelete]
+    [Authorize(Roles = "USER,HOTE,ADMIN")]
+    [Route("{id}")]
+    public IActionResult Delete([FromRoute]string id)
+    {
+        foreach(var c in HttpContext.User.Claims){
+            System.Console.WriteLine(c.Value);
+        }
+        try{
+            _utilisateurService.RemoveUtilisateur(id);
+            return Ok();
+        }catch(Exception e){
+            return BadRequest(e.Message);
+        }
+       
+    }
+
+
+    [AllowAnonymous]
+    [HttpGet]
+    [Route("test")]
+    public IActionResult Test(){
+        return Ok(_utilisateurService.testPublish());
     }
 
 
