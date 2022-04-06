@@ -9,6 +9,7 @@ spring:
     consul:
       discovery:
         register: true
+        hostname: ${CONSUL_HOSTNAME:localhost}
       host: ${CONSUL_HOST:localhost}
       port: ${CONSUL_PORT:8500}
       loadbalancer:
