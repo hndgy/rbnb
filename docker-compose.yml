@@ -12,7 +12,12 @@ services:
         - 15672:15672
         - 5672:5672
 
-
+  # mailhog:
+  #     image: mailhog/mailhog
+  #     container_name: 'mailhog'
+  #     ports:
+  #       - "1025:1025"
+  #       - "8025:8025"
 
   api-gateway:
     build:
@@ -46,6 +51,11 @@ services:
         -DRABBITMQ_PORT=5672
         -DRABBITMQ_USER=guest
         -DRABBITMQ_PWD=guest
+
+        -DMAIL_HOST=smtp.gmail.com
+        -DMAIL_PORT=587
+        -DMAIL_USERNAME=nicolasdeguyenne@gmail.com
+        -DMAIL_APPPWD=zzwvjaxassozlkil
 
     depends_on:
       - discovery
