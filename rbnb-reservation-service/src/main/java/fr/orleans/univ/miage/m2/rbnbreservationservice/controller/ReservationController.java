@@ -3,10 +3,7 @@ package fr.orleans.univ.miage.m2.rbnbreservationservice.controller;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.dto.ReservationDTO;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.entity.Reservation;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.ReservationService;
-import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.CapaciteLogementDepasseException;
-import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.LogementsIndisponibleException;
-import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.NbVoyagageurIncorrecteException;
-import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.ReservationIntrouvableException;
+import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,6 +68,8 @@ public class ReservationController {
             return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.createReservation(reservation,principal));
         } catch (LogementsIndisponibleException | CapaciteLogementDepasseException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (LogementIntrouvableException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -105,7 +104,7 @@ public class ReservationController {
             return ResponseEntity.ok().body(reservationService.getReservationsByIdReservation(idReservation));
         } catch (LogementsIndisponibleException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        } catch (ReservationIntrouvableException e) {
+        } catch (ReservationIntrouvableException | LogementIntrouvableException e) {
             return ResponseEntity.notFound().build();
         } catch (CapaciteLogementDepasseException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
