@@ -10,7 +10,6 @@ import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Logement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.exception.LogementNotFoundException;
 import fr.orleans.univ.miage.m2.rbnblogementservice.service.LogementService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +46,18 @@ public class LogementController {
         template.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTING_KEY, logementList);
         return new ResponseEntity<>(logementList, new HttpHeaders(), HttpStatus.OK);
     }
+
+/*
+//    @RolesAllowed({"ADMIN","USER"})
+    @GetMapping
+    public String getAllLogement(){
+        List<Logement> logementList = null;
+        logementList = logementService.getAllLogements();
+        template.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTING_KEY, logementList);
+        return "Message envoyé";
+    }
+
+ */
 
     @RolesAllowed("HOTE")
     @PostMapping
@@ -85,6 +96,7 @@ public class LogementController {
     @RolesAllowed({"HOTE","USER"})
     @GetMapping("/{idLogement}")
     public ResponseEntity<LogementDto> getLogement(@PathVariable Long idLogement){
+
         LogementDto logement = null;
         //@TODO récupérer le nom et prénom du proprietaire et les renvoyer via le dto
         try {
@@ -97,6 +109,8 @@ public class LogementController {
                     logement.libelle(), logement.address(), logement.nbVoyageurs(),
                     utilisateurDto, logement.images(), logement.equipements(),
                     logement.categories());
+            template.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTING_KEY, logementDto);
+
 
             return new ResponseEntity<>(logementDto, new HttpHeaders(), HttpStatus.OK);
         } catch (LogementNotFoundException e) {
@@ -178,6 +192,8 @@ public class LogementController {
         List<Logement> logements = null;
         try {
             logements = logementService.getAllLogementsByIdProprietaire(idProprietaire);
+
+            template.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTING_KEY, logements);
             return new ResponseEntity<>(logements, new HttpHeaders(), HttpStatus.OK);
         } catch (LogementNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
