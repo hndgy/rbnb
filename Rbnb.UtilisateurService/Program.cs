@@ -65,11 +65,11 @@ builder.Services.AddAuthentication(options =>
                   OnAuthenticationFailed = c =>
                   {
                       c.NoResult();
-                      c.Response.StatusCode = 500;
+                      c.Response.StatusCode = 401;
                       c.Response.ContentType = "text/plain";
 
 
-                      return c.Response.WriteAsync("An error occured processing your authentication. " + c.Exception.Message);
+                      return c.Response.WriteAsync( c.Exception.Message);
                   }
               };
           });
