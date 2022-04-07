@@ -73,7 +73,7 @@ public class UtilisateurController : ControllerBase
             System.Console.WriteLine(c.Value);
         }
         try{
-            _utilisateurService.UpdateUtilisateur(utilisateur);
+            _utilisateurService.UpdateUtilisateur(id,utilisateur);
             return Ok();
         }catch(Exception e){
             return BadRequest(e.Message);
@@ -91,7 +91,7 @@ public class UtilisateurController : ControllerBase
         }
         try{
             _utilisateurService.RemoveUtilisateur(id);
-            return Ok();
+            return NoContent();
         }catch(Exception e){
             return BadRequest(e.Message);
         }

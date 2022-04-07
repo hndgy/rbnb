@@ -10,7 +10,7 @@ public interface IUtilisateurService
     Utilisateur GetUtilisateurById(string id);
     IEnumerable<Utilisateur> GetAllUtilisateur();
 
-    void UpdateUtilisateur( Utilisateur utilisateur);
+    void UpdateUtilisateur(string id, Utilisateur utilisateur);
     void RemoveUtilisateur( string id);
 
     String testPublish();

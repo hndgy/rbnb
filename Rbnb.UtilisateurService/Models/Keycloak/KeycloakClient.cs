@@ -112,7 +112,36 @@ public class KeycloakClient
         System.Console.WriteLine(response.Result.RequestMessage);
 
         return response.Result.IsSuccessStatusCode;
+    } 
+    
+    private bool DeleteUser(string idUser, string adminToken)
+    {
+        _httpClient.DefaultRequestHeaders.Clear();
+        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
+
+
+
+
+
+        Console.WriteLine(_host + "/auth/admin/realms/" + _reaml + "/users/" + idUser );
+        var response = _httpClient.DeleteAsync(
+            _host + "/auth/admin/realms/" + _reaml + "/users/" + idUser
+        );
+
+        response.Wait();
+        System.Console.WriteLine(response.Result.RequestMessage);
+
+        return response.Result.IsSuccessStatusCode;
     }
+
+    public async Task<bool> DeleteUserAsync(string idUser)
+    {
+        var adminToken = await GetTokenAsync("admin-cli", _config.GetValue<string>("keycloak:username"), _config.GetValue<string>("keycloak:password"));
+        return DeleteUser(idUser, adminToken);
+    }
+
+
     private CreationUtilisateurKeycloakResponse CreateUser(CreationUtilisateurDto dto, string adminToken)
     {
         _httpClient.DefaultRequestHeaders.Clear();

@@ -82,9 +82,9 @@ public class UtilisateurService : IUtilisateurService
         return "published";
     }
 
-    public void UpdateUtilisateur(Utilisateur utilisateur)
+    public void UpdateUtilisateur(string id,Utilisateur utilisateur)
     {
-        if(_dbContext.Utilisateurs.Find(utilisateur.Id) != null){
+        if(_dbContext.Utilisateurs.Find(id) != null){
             _dbContext.Utilisateurs.Update(utilisateur);
             _dbContext.SaveChanges();
             var message = JsonConvert.SerializeObject( utilisateur);
@@ -103,14 +103,17 @@ public class UtilisateurService : IUtilisateurService
         Utilisateur user = _dbContext.Utilisateurs.Find(id);
         if(user != null){
             _dbContext.Utilisateurs.Remove(user);
-            _dbContext.SaveChanges();
-            var message = JsonConvert.SerializeObject( user);
-            var body = Encoding.UTF8.GetBytes(user.Id);
+            var deletedKeycloak = _keycloakClient.DeleteUserAsync(id).Result;
+            if(deletedKeycloak){
+                _dbContext.SaveChanges();
+                 var message = JsonConvert.SerializeObject( user);
+                var body = Encoding.UTF8.GetBytes(user.Id);
 
-            _channel.BasicPublish(exchange: Exchange_Remove,
-                                    routingKey: "",
+                _channel.BasicPublish(exchange: Exchange_Remove,
+                                        routingKey: "",
                                     basicProperties: null,
                                     body: body);
+            }
         }
         else
             throw new UtilisateurNonTrouveException();
