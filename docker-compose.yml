@@ -12,6 +12,8 @@ services:
         - 15672:15672
         - 5672:5672
 
+
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -28,6 +30,25 @@ services:
       - logement-service
       - reservation-service
       - review-service
+
+  mailing-service:
+    build:
+      context: ./rbnb-mailing-service
+    ports:
+      - "9006:9006"
+    environment:
+      - JAVA_TOOL_OPTIONS=
+        -DCONSUL_HOST=discovery
+        -DCONSUL_HOSTNAME=mailing-service
+        -DCONSUL_PORT=8500
+
+        -DRABBITMQ_HOST=rabbitmq
+        -DRABBITMQ_PORT=5672
+        -DRABBITMQ_USER=guest
+        -DRABBITMQ_PWD=guest
+
+    depends_on:
+      - discovery
 
   utilisateur-service:
     build:
