@@ -7,6 +7,9 @@ import fr.orleans.univ.miage.m2.rbnbreservationservice.entity.Reservation;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.repository.DisponibiliteRepo;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.repository.ReservationRepo;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -76,17 +79,18 @@ public class ReservationServiceImpl implements ReservationService {
         Date dateDebutDispo;
         Date dateFinDispo;
 
-
+/*
         String urlLogement2 = "http://rbnb-logement-service/"+ reservationDTO.getIdLogement();
         LogementDto2 logementDto2 = restTemplate.getForObject(urlLogement2, LogementDto2.class);
 
         if (logementDto2==null) {
             throw new LogementIntrouvableException();
         }
-
+*/
 
         String urlLogement = "http://rbnb-logement-service/logement/"+ reservationDTO.getIdLogement();
         LogementDTO logementDto = restTemplate.getForObject(urlLogement, LogementDTO.class);
+        //TODO : reverifier les dto
 
         assert logementDto != null;
         if (logementDto.getNbMax()<reservationDTO.getNbVoyageurs()) {
@@ -134,17 +138,30 @@ public class ReservationServiceImpl implements ReservationService {
         }
         throw new LogementsIndisponibleException();
     }
-
+//TODO : faire une classe mapper ?
     @Override
-    public void updateNbVoyageursReservation(String idReservation, int nbVoyageurs) throws NbVoyagageurIncorrecteException, ReservationIntrouvableException, CapaciteLogementDepasseException {
+    public void updateNbVoyageursReservation(String idReservation, int nbVoyageurs, String token) throws NbVoyagageurIncorrecteException, ReservationIntrouvableException, CapaciteLogementDepasseException, LogementIntrouvableException {
         Optional<Reservation> reservation;
         reservation = reservationRepo.findById(idReservation);
 
         if (reservation.isPresent()) {
-            String urlLogement = "http://rbnb-logement-service/logement/"+ reservation.get().getIdLogement();
-            LogementDTO logementDto = restTemplate.getForObject(urlLogement, LogementDTO.class);
+            HttpHeaders headers = new HttpHeaders();
+            String[] tokenArray = token.split(" ");
+            headers.set("Accept", "application/json");
+            headers.add("Authorization", "Bearer " + tokenArray[1]);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
 
-            assert logementDto != null;
+            String urlLogement = "http://rbnb-logement-service/logement/"+ reservation.get().getIdLogement();
+
+            ResponseEntity<LogementDTO> logementDTOResponseEntity =  restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDTO.class);
+            //LogementDTO logementDto = restTemplate.getForObject(urlLogement, LogementDTO.class);
+
+            LogementDTO logementDto = logementDTOResponseEntity.getBody();
+
+            if (logementDto==null){
+                throw new LogementIntrouvableException();
+            }
+
             if (logementDto.getNbMax()<reservation.get().getNbVoyageurs()) {
                 throw new CapaciteLogementDepasseException();
             }
@@ -204,15 +221,26 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Collection<Disponibilite> setDisponibilite(List<DisponibiliteDTO> disponibilitesDTO) throws LogementIntrouvableException {
+    public Collection<Disponibilite> setDisponibilite(List<DisponibiliteDTO> disponibilitesDTO, String token) throws LogementIntrouvableException {
         //TODO : voir avec Benoit pour if logement existe
         if (disponibilitesDTO.isEmpty()){
             throw new NullPointerException();
         }
+
+        HttpHeaders headers = new HttpHeaders();
+        String[] tokenArray = token.split(" ");
+        headers.set("Accept", "application/json");
+        headers.add("Authorization", "Bearer " + tokenArray[1]);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
         String urlLogement = "http://rbnb-logement-service/"+ disponibilitesDTO.get(1).getIdLogement();
-        LogementDto2 logementDto = restTemplate.getForObject(urlLogement, LogementDto2.class);
+
+        ResponseEntity<LogementDto2> logementDto2ResponseEntity = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto2.class);
+        //LogementDto2 logementDto = restTemplate.getForObject(urlLogement, LogementDto2.class);
 
         Collection<Disponibilite> disponibilites = new ArrayList<>();
+
+        LogementDto2 logementDto = logementDto2ResponseEntity.getBody();
 
         if (logementDto!=null) {
             for (DisponibiliteDTO disponibiliteDTO : disponibilitesDTO
@@ -228,4 +256,4 @@ public class ReservationServiceImpl implements ReservationService {
         throw new LogementIntrouvableException();
 
     }
-}
+}//TODO : Delete dispo et reservation quand utilisateur est delete

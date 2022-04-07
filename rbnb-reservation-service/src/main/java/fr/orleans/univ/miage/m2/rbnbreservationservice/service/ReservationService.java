@@ -20,11 +20,11 @@ public interface ReservationService {
 
     Collection<Reservation> getReservationsByVoyageur(Long idVoyageur) throws ReservationIntrouvableException;
     Reservation createReservation(ReservationDTO reservation, Principal principal) throws LogementsIndisponibleException, CapaciteLogementDepasseException, LogementIntrouvableException;
-    void updateNbVoyageursReservation(String idRerservation, int nbVoyageurs) throws NbVoyagageurIncorrecteException, ReservationIntrouvableException, CapaciteLogementDepasseException;
+    void updateNbVoyageursReservation(String idRerservation, int nbVoyageurs, String token) throws NbVoyagageurIncorrecteException, ReservationIntrouvableException, CapaciteLogementDepasseException, LogementIntrouvableException;
     void updateDateReservation(String idReservation, Date dateDebut, Date dateFin, Principal principal) throws LogementsIndisponibleException, ReservationIntrouvableException, CapaciteLogementDepasseException, LogementIntrouvableException;
     void annulerReservation(String idReservation) throws ReservationIntrouvableException;
 
     Reservation getReservationsByIdReservation(String idReservation) throws ReservationIntrouvableException;
 
-    Collection<Disponibilite> setDisponibilite(List<DisponibiliteDTO> disponibilitesDTO) throws LogementIntrouvableException;
+    Collection<Disponibilite> setDisponibilite(List<DisponibiliteDTO> disponibilitesDTO, String token) throws LogementIntrouvableException;
 }

@@ -85,13 +85,13 @@ public class ReservationController {
 
     @RolesAllowed("USER")
     @PutMapping("/reservation/{idReservation}/voyageur")
-    public ResponseEntity<Object> updateNbVoyageursReservation(@PathVariable String idReservation, @RequestBody int nbVoyageurs){
+    public ResponseEntity<Object> updateNbVoyageursReservation(@PathVariable String idReservation, @RequestBody int nbVoyageurs, @RequestHeader(name = "Authorization")String token){
         try {
-            reservationService.updateNbVoyageursReservation(idReservation,nbVoyageurs);
+            reservationService.updateNbVoyageursReservation(idReservation,nbVoyageurs,token);
             return ResponseEntity.ok().body(reservationService.getReservationsByIdReservation(idReservation));
         } catch (NbVoyagageurIncorrecteException | CapaciteLogementDepasseException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        } catch (ReservationIntrouvableException e) {
+        } catch (ReservationIntrouvableException | LogementIntrouvableException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
@@ -122,4 +122,6 @@ public class ReservationController {
         }
     }
 
+    //TODO : set dispo + delete reservation et dispo quand user est delete
+    //@RequestHeader(name = "Authorization")String token
 }
