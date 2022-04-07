@@ -16,6 +16,12 @@ public class UtilisateurService : IUtilisateurService
 
     private const string Exchange_Remove = "rbnb_utilisateurs_remove";
     private const string Exchange_Update = "rbnb_utilisateurs_update";
+
+    private const string Exchange_Mailing = "rbnb_mailing";
+    private const string Mail_Info_RoutingKey = "mailing.info";
+
+
+    
     public IModel _channel;
     public UtilisateurService(IConfiguration config, UserServiceDbContext dbContext)
     {
@@ -42,6 +48,14 @@ public class UtilisateurService : IUtilisateurService
 
     }
 
+    public void PublishMail(MailMessage mail){
+        var message = JsonConvert.SerializeObject(mail);
+        var body = Encoding.UTF8.GetBytes(message);
+            _channel.BasicPublish(exchange: Exchange_Mailing,
+                                    routingKey: Mail_Info_RoutingKey,
+                                    basicProperties: null,
+                                    body: body);
+    }
     public async Task<Utilisateur> InscrireUtilisateurAsync(CreationUtilisateurDto dto)
     {
         if (!dto.CheckPassword())
@@ -57,6 +71,11 @@ public class UtilisateurService : IUtilisateurService
             utilisateur.Id = utilisateurKeycloakResponse.UserId;
             _dbContext.Utilisateurs.Add(utilisateur);
             _dbContext.SaveChanges();
+            PublishMail(new MailMessage(){
+                toEmail = dto.Mail,
+                subject = "Binvenue",
+                content = "Bienvenu " +dto.Prenom +", \n"
+            });
             return utilisateur;
         }
         throw new UtilisateurNonCreeException();
