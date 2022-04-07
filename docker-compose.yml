@@ -87,6 +87,12 @@ services:
         -DMYSQL_DB=rbnb-logement
         -DMYSQL_USER=root
         -DMYSQL_PWD=p
+      
+        -DRABBITMQ_HOST=rabbitmq
+        -DRABBITMQ_PORT=5672
+        -DRABBITMQ_USER=guest
+        -DRABBITMQ_PWD=guest
+
     depends_on:
       - discovery
       - mysql-logement-service
