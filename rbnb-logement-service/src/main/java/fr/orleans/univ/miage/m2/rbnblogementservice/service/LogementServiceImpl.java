@@ -1,16 +1,19 @@
 package fr.orleans.univ.miage.m2.rbnblogementservice.service;
 
-import fr.orleans.univ.miage.m2.rbnblogementservice.controller.LogementController;
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.LogementDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.UtilisateurDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Categorie;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Equipement;
+import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Logement;
+import fr.orleans.univ.miage.m2.rbnblogementservice.exception.LogementNotFoundException;
 import fr.orleans.univ.miage.m2.rbnblogementservice.repository.CategorieRepository;
 import fr.orleans.univ.miage.m2.rbnblogementservice.repository.EquipementRepository;
 import fr.orleans.univ.miage.m2.rbnblogementservice.repository.LogementRepository;
-import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Logement;
-import fr.orleans.univ.miage.m2.rbnblogementservice.exception.LogementNotFoundException;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,16 +24,19 @@ public class LogementServiceImpl implements LogementService {
     private final LogementRepository logementRepository;
     private final EquipementRepository equipementRepository;
     private final CategorieRepository categorieRepository;
+    private final RestTemplate restTemplate;
 
 
     public LogementServiceImpl(
             LogementRepository logementRepository,
             EquipementRepository equipementRepository,
-            CategorieRepository categorieRepository)
+            CategorieRepository categorieRepository,
+            RestTemplate restTemplate)
     {
         this.logementRepository = logementRepository;
         this.equipementRepository = equipementRepository;
         this.categorieRepository = categorieRepository;
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -72,25 +78,34 @@ public class LogementServiceImpl implements LogementService {
     }
 
     @Override
-    public LogementDto getLogementDetailById(Long idLogement) throws LogementNotFoundException {
+    public LogementDto getLogementDetailById(Long idLogement, String token) throws LogementNotFoundException {
         Optional<Logement> logement = logementRepository.findById(idLogement);
         if (logement.isPresent()){
             Logement logement1 = logementRepository.findById(idLogement).get();
             String idUtilisateur = logement1.getIdProprietaire();
             //@TODO requête vers le service utilisateur pour récupérer les infos utilisateur
-            String prenom = "benoit"; //requete prenom
-            String nom = "hote"; //requete nom
+            HttpHeaders headers = new HttpHeaders();
+            String[] tokenArray = token.split(" ");
+            headers.set("Accept", "application/json");
+            headers.add("Authorization", "Bearer " + tokenArray[1]);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            String urlUtilisateur = "http://localhost:9002/Utilisateur/"+ idUtilisateur;
+            UtilisateurDto restUtilisateurDto = restTemplate.exchange(urlUtilisateur, HttpMethod.GET, entity, UtilisateurDto.class).getBody();
 
-            UtilisateurDto utilisateurDto = new UtilisateurDto();
-            utilisateurDto.setId(idUtilisateur);
-            utilisateurDto.setPrenom(prenom);
-            utilisateurDto.setNom(nom);
+//            String prenom = "benoit"; //requete prenom
+//            String nom = "hote"; //requete nom
+
+//            UtilisateurDto utilisateurDto = new UtilisateurDto();
+//            utilisateurDto.setId(idUtilisateur);
+//            utilisateurDto.setPrenom(prenom);
+//            utilisateurDto.setNom(nom);
 
             LogementDto logementDto = new LogementDto(
                     logement1.getLibelle(),
                     logement1.getAddress(),
                     logement1.getNbVoyageurs(),
-                    utilisateurDto,
+                    restUtilisateurDto,
+//                    utilisateurDto,
                     logement1.getImages(),
                     logement1.getEquipements(),
                     logement1.getCategories()

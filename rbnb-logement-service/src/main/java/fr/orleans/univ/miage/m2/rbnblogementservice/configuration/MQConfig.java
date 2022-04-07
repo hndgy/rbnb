@@ -11,18 +11,20 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MQConfig {
 
-    public static final String QUEUE = "logement_queue";
-    public static final String EXCHANGE = "logement_exchange";
-    public static final String ROUTING_KEY = "logement_routingKey";
+    public static final String LOGEMENT_QUEUE = "logement_queue";
+    public static final String LOGEMENT_EXCHANGE = "logement_exchange";
+    public static final String LOGEMENT_ROUTING_KEY = "logement_routingKey";
+    public static final String MAILING_EXCHANGE = "rbnb_mailing";
+    public static final String MAILING_ROUTING_KEY = "mailing.info";
 
     @Bean
-    public Queue queue() {
-        return new Queue(QUEUE);
+    public Queue logementQueue() {
+        return new Queue(LOGEMENT_QUEUE);
     }
 
     @Bean
     public TopicExchange exchange() {
-        return new TopicExchange(EXCHANGE);
+        return new TopicExchange(LOGEMENT_EXCHANGE);
     }
 
     @Bean
@@ -30,7 +32,7 @@ public class MQConfig {
         return BindingBuilder
                 .bind(queue)
                 .to(exchange)
-                .with(ROUTING_KEY);
+                .with(LOGEMENT_ROUTING_KEY);
     }
 
     @Bean
@@ -42,7 +44,7 @@ public class MQConfig {
     public AmqpTemplate template(ConnectionFactory connectionFactory) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter());
-        return  template;
+        return template;
     }
 
 }

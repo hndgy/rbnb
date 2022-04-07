@@ -3,7 +3,6 @@ package fr.orleans.univ.miage.m2.rbnblogementservice.controller;
 import fr.orleans.univ.miage.m2.rbnblogementservice.configuration.MQConfig;
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.CreationLogementDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.LogementDto;
-import fr.orleans.univ.miage.m2.rbnblogementservice.dto.UtilisateurDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Categorie;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Equipement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Logement;
@@ -43,7 +42,7 @@ public class LogementController {
     public ResponseEntity<List<Logement>> getAllLogement(){
         List<Logement> logementList = null;
         logementList = logementService.getAllLogements();
-        template.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTING_KEY, logementList);
+        template.convertAndSend(MQConfig.LOGEMENT_EXCHANGE, MQConfig.LOGEMENT_ROUTING_KEY, logementList);
         return new ResponseEntity<>(logementList, new HttpHeaders(), HttpStatus.OK);
     }
 
@@ -95,24 +94,16 @@ public class LogementController {
 
     @RolesAllowed({"HOTE","USER"})
     @GetMapping("/{idLogement}")
-    public ResponseEntity<LogementDto> getLogement(@PathVariable Long idLogement){
-
+    public ResponseEntity<LogementDto> getLogement(
+            @PathVariable Long idLogement,
+            @RequestHeader(name = "Authorization") String token
+    ){
         LogementDto logement = null;
-        //@TODO récupérer le nom et prénom du proprietaire et les renvoyer via le dto
         try {
-            //@TODO récupérer les infos ici depuis le service utilisateur et les ajouter à l'entité
-            UtilisateurDto utilisateurDto = new UtilisateurDto();
-            //*******************************************************//
+            logement = logementService.getLogementDetailById(idLogement, token);
+            template.convertAndSend(MQConfig.LOGEMENT_EXCHANGE, MQConfig.LOGEMENT_ROUTING_KEY, logement);
 
-            logement = logementService.getLogementDetailById(idLogement);
-            LogementDto logementDto = new LogementDto(
-                    logement.libelle(), logement.address(), logement.nbVoyageurs(),
-                    utilisateurDto, logement.images(), logement.equipements(),
-                    logement.categories());
-            template.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTING_KEY, logementDto);
-
-
-            return new ResponseEntity<>(logementDto, new HttpHeaders(), HttpStatus.OK);
+            return new ResponseEntity<>(logement, new HttpHeaders(), HttpStatus.OK);
         } catch (LogementNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -193,7 +184,7 @@ public class LogementController {
         try {
             logements = logementService.getAllLogementsByIdProprietaire(idProprietaire);
 
-            template.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTING_KEY, logements);
+            template.convertAndSend(MQConfig.LOGEMENT_EXCHANGE, MQConfig.LOGEMENT_ROUTING_KEY, logements);
             return new ResponseEntity<>(logements, new HttpHeaders(), HttpStatus.OK);
         } catch (LogementNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
