@@ -5,7 +5,7 @@ using RabbitMQ.Client;
 using Rbnb.UtilisateuService.Dtos;
 using Rbnb.UtilisateuService.Entities;
 using Rbnb.UtilisateuService.Models;
-using Rbnb.UtilisateuService.RabbitMQ;
+
 
 namespace Rbnb.UtilisateuService.Services;
 
@@ -79,7 +79,6 @@ public class UtilisateurService : IUtilisateurService
     }
 
     public String testPublish(){
-        Producer.Publish(_channel,"rbnb_utilisateurs_create","testkey", new {message = "test"});
         return "published";
     }
 
