@@ -89,7 +89,7 @@ public class UtilisateurService : IUtilisateurService
             _dbContext.Utilisateurs.Update(utilisateur);
             _dbContext.SaveChanges();
             var message = JsonConvert.SerializeObject( utilisateur);
-            var body = Encoding.UTF8.GetBytes(utilisateur.Id);
+            var body = Encoding.UTF8.GetBytes(message);
             _channel.BasicPublish(exchange: Exchange_Update,
                                     routingKey: "",
                                     basicProperties: null,
