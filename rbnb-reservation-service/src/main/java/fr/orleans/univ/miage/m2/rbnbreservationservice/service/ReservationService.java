@@ -16,15 +16,32 @@ import java.util.List;
 
 
 public interface ReservationService {
-    HashMap<Logement, Collection<Reservation>> getReservationsByHote(Long idHote) throws ReservationIntrouvableException;
+    HashMap<Logement, Collection<Reservation>> getReservationsByHote(Long idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException;
 
     Collection<Reservation> getReservationsByVoyageur(Long idVoyageur) throws ReservationIntrouvableException;
-    Reservation createReservation(ReservationDTO reservation, Principal principal) throws LogementsIndisponibleException, CapaciteLogementDepasseException, LogementIntrouvableException;
+    Reservation createReservation(ReservationDTO reservation, Principal principal, String token) throws LogementsIndisponibleException, CapaciteLogementDepasseException, LogementIntrouvableException, UtilisateurInexistantException;
     void updateNbVoyageursReservation(String idRerservation, int nbVoyageurs, String token) throws NbVoyagageurIncorrecteException, ReservationIntrouvableException, CapaciteLogementDepasseException, LogementIntrouvableException;
-    void updateDateReservation(String idReservation, Date dateDebut, Date dateFin, Principal principal) throws LogementsIndisponibleException, ReservationIntrouvableException, CapaciteLogementDepasseException, LogementIntrouvableException;
+    void updateDateReservation(String idReservation, Date dateDebut, Date dateFin, Principal principal, String token) throws LogementsIndisponibleException, ReservationIntrouvableException, CapaciteLogementDepasseException, LogementIntrouvableException, UtilisateurInexistantException;
     void annulerReservation(String idReservation) throws ReservationIntrouvableException;
 
     Reservation getReservationsByIdReservation(String idReservation) throws ReservationIntrouvableException;
 
-    Collection<Disponibilite> setDisponibilite(List<DisponibiliteDTO> disponibilitesDTO, String token) throws LogementIntrouvableException;
+    Collection<Disponibilite> setDisponibilite(Long idLogement, List<DisponibiliteDTO> disponibilitesDTO, String token) throws LogementIntrouvableException;
+
+    void deleteDispoEtReservationWhenHostDeleted(Long idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException;
+
+    void deleteDispoEtReservationWhenClientDeleted(Long idHote) throws ReservationIntrouvableException;
+
+    void deleteReservationClientByClient(Long idClient) throws ReservationIntrouvableException;
+
+    void deleteReservationClientByHote(String idReservation) throws ReservationIntrouvableException;
+
+    void deleteReservationClientWhenLogementDeleted(Long idLogement) throws ReservationIntrouvableException;
 }
+/*
+TODO : Delete dispo et reservation quand client est delete,
+                                   quand hote est delete,
+                                   quand hote annule une reservation,
+                                   quand client annule une reservation,
+                                   hote supprime un logement
+ */
