@@ -5,6 +5,8 @@ public class CreationUtilisateurDto
     public String? Prenom { get; set; }
     public String? Mail { get; set; }
     public String? Username { get; set; }
+    public String? Bio { get; set; }
+    public String? PhotoUrl { get; set; }
     public String? Password { get; set; }
     public String? PasswordConfirmation { get; set; }
     public String? Role { get; set; }

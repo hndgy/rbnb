@@ -72,6 +72,41 @@ public class KeycloakClient
 
         System.Console.WriteLine(response.Result.RequestMessage);
         return response.Result.IsSuccessStatusCode;
+    }  
+    
+    private bool UpdateMail(string idUser, string mail, string adminToken)
+    {
+        _httpClient.DefaultRequestHeaders.Clear();
+        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
+
+
+        var obj = new
+        {
+            email = mail
+        };
+
+        var content = new StringContent(
+            JsonConvert.SerializeObject(obj),
+            Encoding.UTF8,
+            "application/json"
+        );
+
+
+        Console.WriteLine(_host + "/auth/admin/realms/" + _reaml + "/users/" + idUser );
+        var response = _httpClient.PutAsync(
+            _host + "/auth/admin/realms/" + _reaml + "/users/" + idUser ,
+            content
+        );
+        response.Wait();
+
+        System.Console.WriteLine(response.Result.RequestMessage);
+        return response.Result.IsSuccessStatusCode;
+    }
+    public async Task<bool> UpdateMailAsync(string idUser, string mail)
+    {
+        var adminToken = await GetTokenAsync("admin-cli", _config.GetValue<string>("keycloak:username"), _config.GetValue<string>("keycloak:password"));
+        return UpdateMail(idUser, mail, adminToken);
     }
 
     /*

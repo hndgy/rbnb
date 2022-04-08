@@ -1,8 +1,5 @@
 package fr.orleans.univ.miage.m2.rbnbmailingservice.consumers;
 
-
-import com.google.gson.annotations.JsonAdapter;
-
 public class EmailMessage {
     private String toEmail;
     private String subject;
