@@ -19,6 +19,8 @@ public interface LogementService {
 
     LogementDto getLogementDetailById(Long idLogement, String token) throws LogementNotFoundException;
 
+    LogementDto getLogementDetailById(Long idLogement) throws LogementNotFoundException;
+
     List<Logement> getAllLogementsByIdProprietaire(String proprietaire) throws LogementNotFoundException;
 
 //    Optional<Logement> getLogementByIdProprietaireAndId(String proprietaire, Long idLogement) throws LogementNotFoundException;

@@ -12,7 +12,7 @@ public record LogementDto(
         String address,
         String city,
         int nbVoyageurs,
-        UtilisateurDto utilisateurDto,
+        UtilisateurDto proprietaire,
         Set<Image> images,
         List<Equipement> equipements,
         List<Categorie> categories
