@@ -27,6 +27,9 @@ public class Logement {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "city")
+    private String city;
+
     @Column(name = "proprietaire_id")
     private String idProprietaire;
 

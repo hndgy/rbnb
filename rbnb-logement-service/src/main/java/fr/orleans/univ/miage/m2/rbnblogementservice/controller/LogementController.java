@@ -46,6 +46,19 @@ public class LogementController {
         return new ResponseEntity<>(logementList, new HttpHeaders(), HttpStatus.OK);
     }
 
+    @RolesAllowed({"ADMIN","USER"})
+    @GetMapping("/search")
+    public ResponseEntity<List<Logement>> getAllLogementByCity(@RequestParam(defaultValue = "paris") String city) throws LogementNotFoundException {
+        List<Logement> logementList = null;
+        try {
+            logementList = logementService.findAllLogementByCity(city.toLowerCase());
+            template.convertAndSend(MQConfig.LOGEMENT_EXCHANGE, MQConfig.LOGEMENT_ROUTING_KEY, logementList);
+            return new ResponseEntity<>(logementList, new HttpHeaders(), HttpStatus.OK);
+        } catch (LogementNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
 /*
 //    @RolesAllowed({"ADMIN","USER"})
     @GetMapping
@@ -83,6 +96,7 @@ public class LogementController {
         logement.setIdProprietaire(idProprietaire);
         logement.setLibelle(creationLogementDto.libelle());
         logement.setAddress(creationLogementDto.address());
+        logement.setCity(creationLogementDto.city().toLowerCase());
         logement.setNbVoyageurs(creationLogementDto.nbVoyageurs());
         logement.setEquipements(equipements);
         logement.setCategories(categories);
@@ -119,6 +133,11 @@ public class LogementController {
         {
             try {
                 logementService.deleteLogement(idLogement);
+                template.convertAndSend(
+                        MQConfig.LOGEMENT_EXCHANGE,
+                        MQConfig.LOGEMENT_ROUTING_KEY,
+                        "Le logement a bien été supprimé !\n" +
+                                "Données du logement supprimé :\n" + logement);
                 return ResponseEntity.status(HttpStatus.OK).build();
             } catch (LogementNotFoundException e) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -162,6 +181,9 @@ public class LogementController {
             }
             if (creationLogementDto.address() != null) {
                 updateLogement.setAddress(creationLogementDto.address());
+            }
+            if (creationLogementDto.city() != null) {
+                updateLogement.setCity(creationLogementDto.city());
             }
             if (creationLogementDto.nbVoyageurs() != 0) {
                 updateLogement.setNbVoyageurs(creationLogementDto.nbVoyageurs());

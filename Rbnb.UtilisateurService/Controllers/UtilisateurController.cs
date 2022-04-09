@@ -65,20 +65,16 @@ public class UtilisateurController : ControllerBase
 
 
     [HttpPut]
-    [Authorize(Roles = "USER,HOTE")]
+    [Authorize(Roles = "USER,HOTE,ADMIN")]
     [Route("{id}")]
-    public IActionResult Update([FromRoute] String id, Utilisateur utilisateur)
+    public IActionResult Update([FromRoute] String id, UtilisateurUpdateDto utilisateur)
     {
-        foreach(var c in HttpContext.User.Claims){
-            System.Console.WriteLine(c.Value);
-        }
         try{
             _utilisateurService.UpdateUtilisateur(id,utilisateur);
             return Ok();
         }catch(Exception e){
             return BadRequest(e.Message);
         }
-       
     }
 
     [HttpDelete]
@@ -86,9 +82,7 @@ public class UtilisateurController : ControllerBase
     [Route("{id}")]
     public IActionResult Delete([FromRoute]string id)
     {
-        foreach(var c in HttpContext.User.Claims){
-            System.Console.WriteLine(c.Value);
-        }
+       
         try{
             _utilisateurService.RemoveUtilisateur(id);
             return NoContent();

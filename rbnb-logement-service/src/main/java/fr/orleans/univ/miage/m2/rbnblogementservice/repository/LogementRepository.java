@@ -13,5 +13,6 @@ public interface LogementRepository extends JpaRepository<Logement, Long> {
     Logement findLogementByIdProprietaireAndId(String idProprietaire, Long idLogement);
 
     List<Logement> findLogementsByAddress(String address);
+    List<Logement> findLogementsByCity(String city);
 
 }

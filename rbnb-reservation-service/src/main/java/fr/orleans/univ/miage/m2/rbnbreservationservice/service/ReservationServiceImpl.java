@@ -31,18 +31,27 @@ public class ReservationServiceImpl implements ReservationService {
         this.restTemplate = restTemplate;
     }
 
-    @Override
-    public HashMap<Logement, Collection<Reservation>> getReservationsByHote(Long idHote) throws ReservationIntrouvableException { //TODO : Ptdrrrrr jamais de la vie ça fonctionne + manque modifier dto
+    @Override //TODO : revoir les DTO ?
+    public HashMap<Logement, Collection<Reservation>> getReservationsByHote(Long idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException {
+        HttpHeaders headers = new HttpHeaders();
+        String[] tokenArray = token.split(" ");
+        headers.set("Accept", "application/json");
+        headers.add("Authorization", "Bearer " + tokenArray[1]);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
         String urlLogements = "http://rbnb-logement-service/logement/"+ idHote;
 
         ResponseEntity<Logement[]> responseEntity =
-                restTemplate.getForEntity(urlLogements, Logement[].class);
+                restTemplate.exchange(urlLogements, HttpMethod.GET, entity,  Logement[].class);
 
         Logement[] logements = responseEntity.getBody();
 
         ObjectMapper mapper = new ObjectMapper();
 
-        assert logements != null;
+        if (logements==null) {
+            throw new LogementIntrouvableException();
+        }
+
         List<Logement> logementDTOS = Arrays.stream(logements)
                 .map(logementDTO -> mapper.convertValue(logementDTO, Logement.class)).toList();
 
@@ -73,27 +82,36 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Reservation createReservation(ReservationDTO reservationDTO, Principal principal) throws LogementsIndisponibleException, CapaciteLogementDepasseException, LogementIntrouvableException {
+    public Reservation createReservation(ReservationDTO reservationDTO, Principal principal, String token) throws LogementsIndisponibleException, CapaciteLogementDepasseException, LogementIntrouvableException, UtilisateurInexistantException {
         Date dateDebutReservation;
         Date dateFinReservation;
         Date dateDebutDispo;
         Date dateFinDispo;
 
-/*
-        String urlLogement2 = "http://rbnb-logement-service/"+ reservationDTO.getIdLogement();
-        LogementDto2 logementDto2 = restTemplate.getForObject(urlLogement2, LogementDto2.class);
-
-        if (logementDto2==null) {
-            throw new LogementIntrouvableException();
-        }
-*/
+        HttpHeaders headers = new HttpHeaders();
+        String[] tokenArray = token.split(" ");
+        headers.set("Accept", "application/json");
+        headers.add("Authorization", "Bearer " + tokenArray[1]);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         String urlLogement = "http://rbnb-logement-service/logement/"+ reservationDTO.getIdLogement();
-        LogementDTO logementDto = restTemplate.getForObject(urlLogement, LogementDTO.class);
+        ResponseEntity<LogementDTO> logementDTOResponseEntity = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDTO.class);
+        //LogementDTO logementDto = restTemplate.getForObject(urlLogement, LogementDTO.class);
+        LogementDTO logementDTO = logementDTOResponseEntity.getBody();
         //TODO : reverifier les dto
 
-        assert logementDto != null;
-        if (logementDto.getNbMax()<reservationDTO.getNbVoyageurs()) {
+        if (logementDTO==null){
+            throw new LogementIntrouvableException();
+        }
+
+        String urlUtilisateur = "http://localhost:9002/Utilisateur/"+ principal.getName();
+        ResponseEntity<UtilisateurDto> restUtilisateurDto = restTemplate.exchange(urlUtilisateur, HttpMethod.GET, entity, UtilisateurDto.class);
+
+        if (restUtilisateurDto.getBody() == null) {
+            throw new UtilisateurInexistantException();
+        }
+
+        if (logementDTO.getNbMax()<reservationDTO.getNbVoyageurs()) {
             throw new CapaciteLogementDepasseException();
         }
 
@@ -172,7 +190,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void updateDateReservation(String idReservation, Date dateDebut, Date dateFin, Principal principal) throws LogementsIndisponibleException, ReservationIntrouvableException, CapaciteLogementDepasseException, LogementIntrouvableException {
+    public void updateDateReservation(String idReservation, Date dateDebut, Date dateFin, Principal principal, String token) throws LogementsIndisponibleException, ReservationIntrouvableException, CapaciteLogementDepasseException, LogementIntrouvableException, UtilisateurInexistantException {
         Optional<Reservation> reservation2 = reservationRepo.findById(idReservation);
         Reservation reservation = reservation2.get();
         reservation.setDateFin(dateFin);
@@ -186,7 +204,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         this.annulerReservation(idReservation);
 
-        this.createReservation(reservationDTO, principal);
+        this.createReservation(reservationDTO, principal, token);
     }
 
     @Override
@@ -221,8 +239,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Collection<Disponibilite> setDisponibilite(List<DisponibiliteDTO> disponibilitesDTO, String token) throws LogementIntrouvableException {
-        //TODO : voir avec Benoit pour if logement existe
+    public Collection<Disponibilite> setDisponibilite(Long idLogement, List<DisponibiliteDTO> disponibilitesDTO, String token) throws LogementIntrouvableException {
         if (disponibilitesDTO.isEmpty()){
             throw new NullPointerException();
         }
@@ -233,7 +250,7 @@ public class ReservationServiceImpl implements ReservationService {
         headers.add("Authorization", "Bearer " + tokenArray[1]);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        String urlLogement = "http://rbnb-logement-service/"+ disponibilitesDTO.get(1).getIdLogement();
+        String urlLogement = "http://rbnb-logement-service/"+ idLogement;
 
         ResponseEntity<LogementDto2> logementDto2ResponseEntity = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto2.class);
         //LogementDto2 logementDto = restTemplate.getForObject(urlLogement, LogementDto2.class);
@@ -254,6 +271,59 @@ public class ReservationServiceImpl implements ReservationService {
             return disponibilites;
         }
         throw new LogementIntrouvableException();
-
     }
-}//TODO : Delete dispo et reservation quand utilisateur est delete
+
+    @Override
+    public void deleteDispoEtReservationWhenHostDeleted(Long idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException {
+        HashMap<Logement, Collection<Reservation>> reservationsMap =  this.getReservationsByHote(idHote,token);
+
+        Collection<Collection<Reservation>> reservations1 = reservationsMap.values();
+
+        for (Collection<Reservation> reservationCollection: reservations1
+             ) {
+            for (Reservation reservation : reservationCollection
+                 ) {
+                this.annulerReservation(reservation.getId());
+                //TODO : RabbitMq notifier le client de l'annulation de la reservation
+            }
+        }
+    }
+
+    @Override
+    public void deleteDispoEtReservationWhenClientDeleted(Long idClient) throws ReservationIntrouvableException {
+        Collection<Reservation> reservations = this.getReservationsByVoyageur(idClient);
+        for (Reservation reservation : reservations
+             ) {
+            this.annulerReservation(reservation.getId());
+            //TODO: RabbitMq notifier l'hote de l'annulation de la reservation
+        }
+    }
+
+    @Override
+    public void deleteReservationClientByClient(Long idClient) throws ReservationIntrouvableException {
+       Collection<Reservation> reservations = reservationRepo.findAllReservationsByIdClient(idClient);
+
+        for (Reservation reservation : reservations
+             ) {
+             this.annulerReservation(reservation.getId());
+             //TODO: RabbitMq notifier l'hote de l'annulation de la reservation
+        }
+    }
+
+    @Override
+    public void deleteReservationClientByHote(String idReservation) throws ReservationIntrouvableException {
+        this.annulerReservation(idReservation);
+        //TODO: RabbitMq notifier le client de l'annulation de sa reservation
+    }
+
+    @Override
+    public void deleteReservationClientWhenLogementDeleted(Long idLogement) throws ReservationIntrouvableException {
+        Collection<Reservation> reservations = reservationRepo.findAllReservationsByIdLogement(idLogement);
+
+        for (Reservation reservation : reservations
+             ) {
+            this.annulerReservation(reservation.getId());
+            //TODO: RabbitMq notifier le client de l'annulation de la reservation
+        }
+    }
+}

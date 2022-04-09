@@ -11,7 +11,9 @@ public class Mapper
             Nom = obj.Nom,
             Prenom = obj.Prenom,
             UserName = obj.Username,
-            Mail = obj.Mail
+            Mail = obj.Mail,
+            PhotoUrl = obj.PhotoUrl,
+            Bio = obj.Bio
         };
     }
 }
