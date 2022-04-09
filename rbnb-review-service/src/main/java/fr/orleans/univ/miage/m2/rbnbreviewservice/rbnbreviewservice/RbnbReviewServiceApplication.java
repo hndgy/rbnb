@@ -31,15 +31,18 @@ public class RbnbReviewServiceApplication {
         SpringApplication.run(RbnbReviewServiceApplication.class, args);
     }
 
-   /* @Bean
+   @Bean
     public CommandLineRunner runner(PrestationRepo prestationRepo) {
         return args -> {
             var p = new Prestation();
             var q = new Prestation();
+            var v = new Prestation();
             p.setLibelle("Localisation");
             q.setLibelle("Propreté");
+            v.setLibelle("Equipement");
             prestationRepo.save(p);
             prestationRepo.save(q);
+            prestationRepo.save(v);
         };
-    }*/
+    }
 }
