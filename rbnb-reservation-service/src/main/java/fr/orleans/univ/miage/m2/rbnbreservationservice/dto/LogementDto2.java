@@ -1,14 +1,18 @@
 package fr.orleans.univ.miage.m2.rbnbreservationservice.dto;
 
+import lombok.Data;
+
 import java.util.List;
 import java.util.Set;
 
-public record LogementDto2(
-        String libelle,
-        String address,
-        int nbVoyageurs,
-        String utilisateurDto,
-        Set<Image> images,
-        List<Equipement> equipements,
-        List<Categorie> categories
-) {}
+@Data
+public class LogementDto2 {
+    private String libelle;
+    private String address;
+    private int nbVoyageurs;
+    private String utilisateurDto;
+    private Set<Image> images;
+    private List<Equipement> equipements;
+    private List<Categorie> categories;
+}
+

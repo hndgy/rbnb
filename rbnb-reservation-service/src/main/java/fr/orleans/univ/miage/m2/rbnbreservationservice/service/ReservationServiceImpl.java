@@ -39,7 +39,7 @@ public class ReservationServiceImpl implements ReservationService {
         headers.add("Authorization", "Bearer " + tokenArray[1]);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        String urlLogements = "http://rbnb-logement-service/logement/"+ idHote;
+        String urlLogements = "http://localhost:9003/logement/proprietaire/"+ idHote;
 
         ResponseEntity<Logement[]> responseEntity =
                 restTemplate.exchange(urlLogements, HttpMethod.GET, entity,  Logement[].class);
@@ -93,7 +93,7 @@ public class ReservationServiceImpl implements ReservationService {
         headers.set("Accept", "application/json");
         headers.add("Authorization", "Bearer " + tokenArray[1]);
         HttpEntity<String> entity = new HttpEntity<>(headers);
-/*
+
         String urlLogement = "http://localhost:9003/logement/"+ reservationDTO.getIdLogement();
         ResponseEntity<LogementDto2> logementDTOResponseEntity = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto2.class);
         //LogementDTO logementDto = restTemplate.getForObject(urlLogement, LogementDTO.class);
@@ -103,7 +103,7 @@ public class ReservationServiceImpl implements ReservationService {
         if (logementDTO==null){
             throw new LogementIntrouvableException();
         }
-/*
+
         String urlUtilisateur = "http://localhost:9002/Utilisateur/"+ principal.getName();
         ResponseEntity<UtilisateurDto> restUtilisateurDto = restTemplate.exchange(urlUtilisateur, HttpMethod.GET, entity, UtilisateurDto.class);
 
@@ -111,10 +111,10 @@ public class ReservationServiceImpl implements ReservationService {
             throw new UtilisateurInexistantException();
         }
 
-        if (logementDTO.nbVoyageurs()<reservationDTO.getNbVoyageurs()) {
+        if (logementDTO.getNbVoyageurs()<reservationDTO.getNbVoyageurs()) {
             throw new CapaciteLogementDepasseException();
         }
-*/
+
         Reservation reservation = new Reservation();
         reservation.setNbVoyageurs(reservationDTO.getNbVoyageurs());
         reservation.setIdLogement(reservationDTO.getIdLogement());
@@ -124,9 +124,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         Collection<Disponibilite> disponibilites = disponibiliteRepo.findAllDispoById((reservation.getIdLogement()));
 
-//        if (disponibilites.isEmpty()){
-//            throw new LogementsIndisponibleException();
-//        }
+       if (disponibilites.isEmpty()){
+          throw new LogementsIndisponibleException();
+      }
 
         dateDebutReservation = reservation.getDateDebut();
         dateFinReservation = reservation.getDateFin();
@@ -156,6 +156,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
         throw new LogementsIndisponibleException();
     }
+
 //TODO : faire une classe mapper ?
     @Override
     public void updateNbVoyageursReservation(String idReservation, int nbVoyageurs, String token) throws NbVoyagageurIncorrecteException, ReservationIntrouvableException, CapaciteLogementDepasseException, LogementIntrouvableException {
@@ -171,16 +172,16 @@ public class ReservationServiceImpl implements ReservationService {
 
             String urlLogement = "http://rbnb-logement-service/logement/"+ reservation.get().getIdLogement();
 
-            ResponseEntity<LogementDTO> logementDTOResponseEntity =  restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDTO.class);
+            ResponseEntity<LogementDto2> logementDTOResponseEntity =  restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto2.class);
             //LogementDTO logementDto = restTemplate.getForObject(urlLogement, LogementDTO.class);
 
-            LogementDTO logementDto = logementDTOResponseEntity.getBody();
+            LogementDto2 logementDto = logementDTOResponseEntity.getBody();
 
             if (logementDto==null){
                 throw new LogementIntrouvableException();
             }
 
-            if (logementDto.getNbMax()<reservation.get().getNbVoyageurs()) {
+            if (logementDto.getNbVoyageurs()<reservation.get().getNbVoyageurs()) {
                 throw new CapaciteLogementDepasseException();
             }
             reservation.get().setNbVoyageurs(nbVoyageurs);
@@ -239,40 +240,43 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Collection<Disponibilite> setDisponibilite(Long idLogement, List<DisponibiliteDTO> disponibilitesDTO, String token)
-//            throws LogementIntrouvableException
-    {
+    public Collection<Disponibilite> setDisponibilite(Long idLogement, List<DisponibiliteDTO> disponibilitesDTO, String token, Principal principal) throws LogementIntrouvableException, UtilisateurInexistantException {
         if (disponibilitesDTO.isEmpty()){
             throw new NullPointerException();
         }
-/*
+
         HttpHeaders headers = new HttpHeaders();
         String[] tokenArray = token.split(" ");
         headers.set("Accept", "application/json");
         headers.add("Authorization", "Bearer " + tokenArray[1]);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        String urlLogement = "http://rbnb-logement-service/"+ idLogement;
+        String urlLogement = "http://localhost:9003/logement/"+ idLogement;
 
         ResponseEntity<LogementDto2> logementDto2ResponseEntity = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto2.class);
         //LogementDto2 logementDto = restTemplate.getForObject(urlLogement, LogementDto2.class);
 
         LogementDto2 logementDto = logementDto2ResponseEntity.getBody();
-*/
+
         Collection<Disponibilite> disponibilites = new ArrayList<>();
 
-//        if (logementDto!=null) {
-            for (DisponibiliteDTO disponibiliteDTO : disponibilitesDTO
-                 ) {
-                Disponibilite disponibilite = new Disponibilite();
-                disponibilite.setIdLogement(disponibiliteDTO.getIdLogement());
-                disponibilite.setDateDebut(disponibiliteDTO.getDateDebut());
-                disponibilite.setDateFin(disponibiliteDTO.getDateFin());
-                disponibilites.add(disponibilite);
+        if (logementDto!=null) {
+            if (principal.getName().equals(logementDto.getUtilisateurDto())) {
+                for (DisponibiliteDTO disponibiliteDTO : disponibilitesDTO
+                ) {
+                    Disponibilite disponibilite = new Disponibilite();
+                    disponibilite.setIdLogement(disponibiliteDTO.getIdLogement());
+                    disponibilite.setDateDebut(disponibiliteDTO.getDateDebut());
+                    disponibilite.setDateFin(disponibiliteDTO.getDateFin());
+                    disponibilites.add(disponibilite);
+                }
+            }
+            else {
+                throw new UtilisateurInexistantException();
             }
             return disponibilites;
-//        }
-//        throw new LogementIntrouvableException();
+        }
+        throw new LogementIntrouvableException();
     }
 
     @Override

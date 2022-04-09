@@ -111,16 +111,19 @@ public class ReservationController {
         }
     }
 
-    //TODO : URL + verif proprietaire ? + générer les idDisponibilite
+    //TODO : URL + générer les idDisponibilite ???
     @RolesAllowed("HOTE")
     @PostMapping("/hote/disponibilite/{idLogement}")
-    public ResponseEntity<Object> setDisponibilite(@PathVariable Long idLogement, @RequestBody List<DisponibiliteDTO> disponibilitesDTO , @RequestHeader(name = "Authorization")String token) {
-//        try {
-            return ResponseEntity.ok().body(reservationService.setDisponibilite(idLogement,disponibilitesDTO, token));
-//        } catch (LogementIntrouvableException e) {
-//            return ResponseEntity.notFound().build();
-//        }
+    public ResponseEntity<Object> setDisponibilite(@PathVariable Long idLogement, @RequestBody List<DisponibiliteDTO> disponibilitesDTO , @RequestHeader(name = "Authorization")String token, Principal principal) {
+        try {
+            return ResponseEntity.ok().body(reservationService.setDisponibilite(idLogement,disponibilitesDTO,token, principal));
+        } catch (LogementIntrouvableException | UtilisateurInexistantException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
+
+
+
 /*
     @RolesAllowed("HOTE")
     @DeleteMapping("/hote/reservation/{idHote}")
