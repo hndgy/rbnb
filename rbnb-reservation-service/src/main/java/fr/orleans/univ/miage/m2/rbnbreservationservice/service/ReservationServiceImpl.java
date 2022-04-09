@@ -170,7 +170,7 @@ public class ReservationServiceImpl implements ReservationService {
             headers.add("Authorization", "Bearer " + tokenArray[1]);
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
-            String urlLogement = "http://rbnb-logement-service/logement/"+ reservation.get().getIdLogement();
+            String urlLogement = "http://localhost:9003/logement/"+ reservation.get().getIdLogement();
 
             ResponseEntity<LogementDto2> logementDTOResponseEntity =  restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto2.class);
             //LogementDTO logementDto = restTemplate.getForObject(urlLogement, LogementDTO.class);
