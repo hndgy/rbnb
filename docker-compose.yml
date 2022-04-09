@@ -156,7 +156,7 @@ services:
         -DMONGO_HOST=mongo-reservation-service
         -DMONGO_PORT=27017
         -DMONGO_DB=rbnb-reservation
-        -DMONGO_USER=admin
+        -DMONGO_USER=root
         -DMONGO_PW=p
     depends_on:
       - discovery
