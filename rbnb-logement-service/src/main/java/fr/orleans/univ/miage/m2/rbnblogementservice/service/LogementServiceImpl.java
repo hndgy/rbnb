@@ -103,6 +103,7 @@ public class LogementServiceImpl implements LogementService {
             LogementDto logementDto = new LogementDto(
                     logement1.getLibelle(),
                     logement1.getAddress(),
+                    logement1.getCity(),
                     logement1.getNbVoyageurs(),
                     restUtilisateurDto,
 //                    utilisateurDto,
@@ -141,6 +142,15 @@ public class LogementServiceImpl implements LogementService {
         List<Logement> logements = logementRepository.findLogementsByAddress(address);
         if (logements.isEmpty()) {
             throw new LogementNotFoundException("Logements introuvables pour l'adresse : " + address);
+        }
+        else return logements;
+    }
+
+    @Override
+    public List<Logement> findAllLogementByCity(String city) throws LogementNotFoundException {
+        List<Logement> logements = logementRepository.findLogementsByCity(city);
+        if (logements.isEmpty()) {
+            throw new LogementNotFoundException("Logements introuvables pour la ville : " + city);
         }
         else return logements;
     }
