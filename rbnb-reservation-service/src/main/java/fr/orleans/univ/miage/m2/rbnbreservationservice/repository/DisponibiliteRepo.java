@@ -11,7 +11,7 @@ import java.util.Date;
 @Repository
 public interface DisponibiliteRepo extends MongoRepository<Disponibilite, String> {
 
-    Disponibilite findByIdLogement(Long idLogement);
+//    Disponibilite findByIdLogement(Long idLogement);
 
    Collection<Disponibilite> findAllDispoById(Long idLogement);
 

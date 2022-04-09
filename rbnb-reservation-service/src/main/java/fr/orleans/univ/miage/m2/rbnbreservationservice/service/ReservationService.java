@@ -26,7 +26,8 @@ public interface ReservationService {
 
     Reservation getReservationsByIdReservation(String idReservation) throws ReservationIntrouvableException;
 
-    Collection<Disponibilite> setDisponibilite(Long idLogement, List<DisponibiliteDTO> disponibilitesDTO, String token) throws LogementIntrouvableException;
+    Collection<Disponibilite> setDisponibilite(Long idLogement, List<DisponibiliteDTO> disponibilitesDTO, String token) ;
+//            throws LogementIntrouvableException;
 
     void deleteDispoEtReservationWhenHostDeleted(Long idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException;
 

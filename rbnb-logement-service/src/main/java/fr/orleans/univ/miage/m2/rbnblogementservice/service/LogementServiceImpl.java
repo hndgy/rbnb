@@ -1,7 +1,7 @@
 package fr.orleans.univ.miage.m2.rbnblogementservice.service;
 
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.LogementDto;
-import fr.orleans.univ.miage.m2.rbnblogementservice.dto.UtilisateurDto;
+import fr.orleans.univ.miage.m2.rbnblogementservice.dto.ProprietaireDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Categorie;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Equipement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Logement;
@@ -76,12 +76,12 @@ public class LogementServiceImpl implements LogementService {
             throw new LogementNotFoundException("Logement introuvable pour l'id : " + idLogement);
         }
     }
-
+/*
     @Override
     public LogementDto getLogementDetailById(Long idLogement, String token) throws LogementNotFoundException {
         Optional<Logement> logement = logementRepository.findById(idLogement);
         if (logement.isPresent()){
-            Logement logement1 = logementRepository.findById(idLogement).get();
+            Logement logement1 = logement.get();
             String idUtilisateur = logement1.getIdProprietaire();
             //@TODO requête vers le service utilisateur pour récupérer les infos utilisateur
             HttpHeaders headers = new HttpHeaders();
@@ -89,8 +89,8 @@ public class LogementServiceImpl implements LogementService {
             headers.set("Accept", "application/json");
             headers.add("Authorization", "Bearer " + tokenArray[1]);
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            String urlUtilisateur = "http://localhost:9000/api/utilisateur/"+ idUtilisateur;
-            UtilisateurDto restUtilisateurDto = restTemplate.exchange(urlUtilisateur, HttpMethod.GET, entity, UtilisateurDto.class).getBody();
+            String urlUtilisateur = "http://localhost:9002/Utilisateur/"+ idUtilisateur;
+            ProprietaireDto restUtilisateurDto = restTemplate.exchange(urlUtilisateur, HttpMethod.GET, entity, ProprietaireDto.class).getBody();
 
             LogementDto logementDto = new LogementDto(
                     logement1.getLibelle(),
@@ -108,7 +108,7 @@ public class LogementServiceImpl implements LogementService {
             throw new LogementNotFoundException("Logement introuvable pour l'id : " + idLogement);
         }
     }
-
+*/
 
     @Override
     public LogementDto getLogementDetailById(Long idLogement) throws LogementNotFoundException {
@@ -119,18 +119,20 @@ public class LogementServiceImpl implements LogementService {
             //@TODO requête vers le service utilisateur pour récupérer les infos utilisateur
             String prenom = "benoit"; //requete prenom
             String nom = "hote"; //requete nom
-
+/*
             UtilisateurDto utilisateurDto = new UtilisateurDto();
             utilisateurDto.setId(idUtilisateur);
             utilisateurDto.setPrenom(prenom);
             utilisateurDto.setNom(nom);
 
+
+ */
             LogementDto logementDto = new LogementDto(
                     logement1.getLibelle(),
                     logement1.getAddress(),
                     logement1.getCity(),
                     logement1.getNbVoyageurs(),
-                    utilisateurDto,
+                    logement1.getIdProprietaire(),
                     logement1.getImages(),
                     logement1.getEquipements(),
                     logement1.getCategories()
@@ -141,6 +143,8 @@ public class LogementServiceImpl implements LogementService {
             throw new LogementNotFoundException("Logement introuvable pour l'id : " + idLogement);
         }
     }
+
+
 
     @Override
     public List<Logement> getAllLogementsByIdProprietaire(String idProprietaire) throws LogementNotFoundException {

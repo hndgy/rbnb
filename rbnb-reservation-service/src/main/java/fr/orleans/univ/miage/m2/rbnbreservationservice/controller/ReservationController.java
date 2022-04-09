@@ -111,17 +111,17 @@ public class ReservationController {
         }
     }
 
-    /* TODO : URL
+    //TODO : URL + verif proprietaire ? + générer les idDisponibilite
     @RolesAllowed("HOTE")
     @PostMapping("/hote/disponibilite/{idLogement}")
     public ResponseEntity<Object> setDisponibilite(@PathVariable Long idLogement, @RequestBody List<DisponibiliteDTO> disponibilitesDTO , @RequestHeader(name = "Authorization")String token) {
-        try {
+//        try {
             return ResponseEntity.ok().body(reservationService.setDisponibilite(idLogement,disponibilitesDTO, token));
-        } catch (LogementIntrouvableException e) {
-            return ResponseEntity.notFound().build();
-        }
+//        } catch (LogementIntrouvableException e) {
+//            return ResponseEntity.notFound().build();
+//        }
     }
-
+/*
     @RolesAllowed("HOTE")
     @DeleteMapping("/hote/reservation/{idHote}")
     public ResponseEntity<Object> deleteReservationEtUpdateDispoWhenHostDeleted(@PathVariable Long idHote, @RequestHeader(name = "Authorization")String token) {

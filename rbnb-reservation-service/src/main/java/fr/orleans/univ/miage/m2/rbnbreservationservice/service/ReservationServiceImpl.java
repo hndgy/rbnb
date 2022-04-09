@@ -93,17 +93,17 @@ public class ReservationServiceImpl implements ReservationService {
         headers.set("Accept", "application/json");
         headers.add("Authorization", "Bearer " + tokenArray[1]);
         HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        String urlLogement = "http://rbnb-logement-service/logement/"+ reservationDTO.getIdLogement();
-        ResponseEntity<LogementDTO> logementDTOResponseEntity = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDTO.class);
+/*
+        String urlLogement = "http://localhost:9003/logement/"+ reservationDTO.getIdLogement();
+        ResponseEntity<LogementDto2> logementDTOResponseEntity = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto2.class);
         //LogementDTO logementDto = restTemplate.getForObject(urlLogement, LogementDTO.class);
-        LogementDTO logementDTO = logementDTOResponseEntity.getBody();
+        LogementDto2 logementDTO = logementDTOResponseEntity.getBody();
         //TODO : reverifier les dto
 
         if (logementDTO==null){
             throw new LogementIntrouvableException();
         }
-
+/*
         String urlUtilisateur = "http://localhost:9002/Utilisateur/"+ principal.getName();
         ResponseEntity<UtilisateurDto> restUtilisateurDto = restTemplate.exchange(urlUtilisateur, HttpMethod.GET, entity, UtilisateurDto.class);
 
@@ -111,10 +111,10 @@ public class ReservationServiceImpl implements ReservationService {
             throw new UtilisateurInexistantException();
         }
 
-        if (logementDTO.getNbMax()<reservationDTO.getNbVoyageurs()) {
+        if (logementDTO.nbVoyageurs()<reservationDTO.getNbVoyageurs()) {
             throw new CapaciteLogementDepasseException();
         }
-
+*/
         Reservation reservation = new Reservation();
         reservation.setNbVoyageurs(reservationDTO.getNbVoyageurs());
         reservation.setIdLogement(reservationDTO.getIdLogement());
@@ -124,9 +124,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         Collection<Disponibilite> disponibilites = disponibiliteRepo.findAllDispoById((reservation.getIdLogement()));
 
-        if (disponibilites.isEmpty()){
-            throw new LogementsIndisponibleException();
-        }
+//        if (disponibilites.isEmpty()){
+//            throw new LogementsIndisponibleException();
+//        }
 
         dateDebutReservation = reservation.getDateDebut();
         dateFinReservation = reservation.getDateFin();
@@ -239,11 +239,13 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Collection<Disponibilite> setDisponibilite(Long idLogement, List<DisponibiliteDTO> disponibilitesDTO, String token) throws LogementIntrouvableException {
+    public Collection<Disponibilite> setDisponibilite(Long idLogement, List<DisponibiliteDTO> disponibilitesDTO, String token)
+//            throws LogementIntrouvableException
+    {
         if (disponibilitesDTO.isEmpty()){
             throw new NullPointerException();
         }
-
+/*
         HttpHeaders headers = new HttpHeaders();
         String[] tokenArray = token.split(" ");
         headers.set("Accept", "application/json");
@@ -255,11 +257,11 @@ public class ReservationServiceImpl implements ReservationService {
         ResponseEntity<LogementDto2> logementDto2ResponseEntity = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto2.class);
         //LogementDto2 logementDto = restTemplate.getForObject(urlLogement, LogementDto2.class);
 
+        LogementDto2 logementDto = logementDto2ResponseEntity.getBody();
+*/
         Collection<Disponibilite> disponibilites = new ArrayList<>();
 
-        LogementDto2 logementDto = logementDto2ResponseEntity.getBody();
-
-        if (logementDto!=null) {
+//        if (logementDto!=null) {
             for (DisponibiliteDTO disponibiliteDTO : disponibilitesDTO
                  ) {
                 Disponibilite disponibilite = new Disponibilite();
@@ -269,8 +271,8 @@ public class ReservationServiceImpl implements ReservationService {
                 disponibilites.add(disponibilite);
             }
             return disponibilites;
-        }
-        throw new LogementIntrouvableException();
+//        }
+//        throw new LogementIntrouvableException();
     }
 
     @Override

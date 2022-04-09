@@ -3,7 +3,6 @@ package fr.orleans.univ.miage.m2.rbnblogementservice.controller;
 import fr.orleans.univ.miage.m2.rbnblogementservice.configuration.MQConfig;
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.CreationLogementDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.LogementDto;
-import fr.orleans.univ.miage.m2.rbnblogementservice.dto.UtilisateurDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Categorie;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Equipement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Logement;
@@ -106,7 +105,7 @@ public class LogementController {
         return new ResponseEntity<>(nouveauLogement, new HttpHeaders(), HttpStatus.CREATED);
     }
 
-/*
+
     @RolesAllowed({"HOTE","USER"})
     @GetMapping("/{idLogement}")
     public ResponseEntity<LogementDto> getLogement(
@@ -115,7 +114,9 @@ public class LogementController {
     ){
         LogementDto logement = null;
         try {
-            logement = logementService.getLogementDetailById(idLogement, token);
+            logement = logementService.getLogementDetailById(idLogement
+//                    , token
+            );
             template.convertAndSend(MQConfig.LOGEMENT_EXCHANGE, MQConfig.LOGEMENT_ROUTING_KEY, logement);
 
             return new ResponseEntity<>(logement, new HttpHeaders(), HttpStatus.OK);
@@ -123,8 +124,8 @@ public class LogementController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
- */
 
+/*
     @RolesAllowed({"HOTE","USER"})
     @GetMapping("/{idLogement}")
     public ResponseEntity<LogementDto> getLogement(@PathVariable Long idLogement){
@@ -134,7 +135,7 @@ public class LogementController {
         try {
             //@TODO récupérer les infos ici depuis le service utilisateur et les ajouter à l'entité
             UtilisateurDto utilisateurDto = new UtilisateurDto();
-            //*******************************************************//
+
 
             logement = logementService.getLogementDetailById(idLogement);
             LogementDto logementDto = new LogementDto(
@@ -149,6 +150,7 @@ public class LogementController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+    */
 
     @RolesAllowed("HOTE")
     @DeleteMapping("/{idLogement}")
