@@ -13,7 +13,7 @@ import java.util.List;
 public interface ReviewService {
 
     //create
-    Review createReview(ReviewCreationDto reviewCreationDto);
+    ReviewDto createReview(ReviewCreationDto reviewCreationDto);
 
     NotationDto createNotation(NotationDto notationDto);
 
@@ -29,6 +29,8 @@ public interface ReviewService {
     List<Notation> getAllByIdReview(Long idReview);
 
     List<Notation> getAllByIdPrestation(Long idPrestation);
+
+    List<Prestation> getAllPrestation();
 
     //delete
     void deleteById(Long id) throws ReviewNotFoundException;

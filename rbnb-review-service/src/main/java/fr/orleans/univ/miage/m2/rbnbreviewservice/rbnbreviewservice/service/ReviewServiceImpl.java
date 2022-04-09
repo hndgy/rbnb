@@ -1,9 +1,6 @@
 package fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.service;
 
-import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.NotationDto;
-import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.ReviewCreationDto;
-import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.ReviewDto;
-import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.UtilisateurDto;
+import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.dto.*;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.entity.Notation;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.entity.Prestation;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.entity.Review;
@@ -14,6 +11,7 @@ import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.repository.N
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.repository.PrestationRepo;
 import fr.orleans.univ.miage.m2.rbnbreviewservice.rbnbreviewservice.repository.ReviewRepo;
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -33,23 +31,30 @@ public class ReviewServiceImpl implements ReviewService{
 
     private final RestTemplate restTemplate;
 
+    private final RabbitTemplate template;
+
     private final DiscoveryClient discoveryClient;
     private final ModelMapper modelMapper;
 
-    public ReviewServiceImpl(ReviewRepo reviewRepo, NotationRepo notationRepo, PrestationRepo prestationRepo, RestTemplate restTemplate, DiscoveryClient discoveryClient, ModelMapper modelMapper) {
+    private final Mapper mapper;
+
+    public ReviewServiceImpl(ReviewRepo reviewRepo, NotationRepo notationRepo, PrestationRepo prestationRepo, RestTemplate restTemplate, RabbitTemplate template, DiscoveryClient discoveryClient, ModelMapper modelMapper, Mapper mapper) {
         this.reviewRepo = reviewRepo;
         this.notationRepo = notationRepo;
         this.prestationRepo = prestationRepo;
         this.restTemplate = restTemplate;
+        this.template = template;
         this.discoveryClient = discoveryClient;
         this.modelMapper = modelMapper;
+        this.mapper = mapper;
     }
 
     @Override
-    public Review createReview(ReviewCreationDto reviewDto) {
-        Review review = Mapper.reviewCreationToReview(reviewDto);
+    public ReviewDto createReview(ReviewCreationDto reviewCreationDto) {
+        Review review = mapper.reviewCreationToReview(reviewCreationDto);
         Review saved = reviewRepo.save(review);
-        return saved;
+        ReviewDto reviewDto = mapper.reviewToReviewDto(review);
+        return reviewDto;
     }
 
     @Override
@@ -68,14 +73,14 @@ public class ReviewServiceImpl implements ReviewService{
     public List<ReviewDto> getAllByLogement(Long idLogement) {
         return reviewRepo.findAllByIdLogement(idLogement)
                 .stream()
-                .map(review -> modelMapper.map(review, ReviewDto.class))
+                .map(mapper::reviewToReviewDto)
                 .collect(Collectors.toList());
     }
 
     public List<ReviewDto> getAllByUtilisateur(String idUtilisateur){
         return reviewRepo.findAllByIdUtilisateur(idUtilisateur)
                 .stream()
-                .map(review -> modelMapper.map(review, ReviewDto.class))
+                .map(mapper::reviewToReviewDto)
                 .collect(Collectors.toList());
     }
 
@@ -85,18 +90,28 @@ public class ReviewServiceImpl implements ReviewService{
        Optional<Review> review = reviewRepo.findById(id);
        if (review.isPresent()){
            Review returnReview = review.get();
-           ReviewDto reviewDto = Mapper.reviewToReviewDto(returnReview);
+           ReviewDto reviewDto = mapper.reviewToReviewDto(returnReview);
+           reviewDto.setNotations(returnReview.getNotations().stream().map(
+
+                   n -> {
+                       var notation = new NotationDto();
+                       notation.setEtoile(n.getEtoile());
+                       notation.setId(n.getId());
+                       notation.setPrestation(n.getPrestation().getLibelle());
+                       return notation;
+                   }
+           ).collect(Collectors.toList()));
            HttpHeaders headers = new HttpHeaders();
            String[] tokenArray = token.split(" ");
            headers.set("Accept", "application/json");
            headers.add("Authorization", "Bearer " + tokenArray[1]);
            HttpEntity<String> entity = new HttpEntity<>(headers);
            String urlUtilisateur = "http://localhost:9002/Utilisateur/"+ returnReview.getIdUtilisateur();
-           //String urlLogement = "http://rbnb-logement-service/logement/"+ returnReview.getIdLogement();
+           //String urlLogement = "http://localhost:9003/logement/"+ returnReview.getIdLogement();
            ResponseEntity<UtilisateurDto> restUtilisateurDto = restTemplate.exchange(urlUtilisateur, HttpMethod.GET, entity, UtilisateurDto.class);
-           //LogementDto logementDto = restTemplate.getForObject(urlLogement, LogementDto.class);
+          //ResponseEntity<LogementDto> restLogementDto = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto.class);
            reviewDto.setUtilisateur(restUtilisateurDto.getBody());
-           //.setLogement(logementDto);
+           //reviewDto.setLogement(restLogementDto.getBody());
            return reviewDto;
        }else {
            throw new ReviewNotFoundException(id);
@@ -143,5 +158,9 @@ public class ReviewServiceImpl implements ReviewService{
         }else {
             throw new PrestationNotFoundException(id);
         }
+    }
+    @Override
+    public List<Prestation> getAllPrestation(){
+        return prestationRepo.findAll();
     }
 }
