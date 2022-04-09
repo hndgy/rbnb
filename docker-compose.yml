@@ -76,6 +76,7 @@ services:
     depends_on:
       - discovery
       - mysql-utilisateur-service
+      - rabbitmq
 
   mysql-utilisateur-service:
     image: mysql
@@ -127,6 +128,8 @@ services:
     depends_on:
       - discovery
       - mysql-logement-service
+      - rabbitmq
+
 
   mysql-logement-service:
     image: mysql
@@ -196,6 +199,8 @@ services:
     depends_on:
       - discovery
       - mysql-review-service
+      - rabbitmq
+
 
   mysql-review-service:
     platform: linux/amd64
