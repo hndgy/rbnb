@@ -89,7 +89,7 @@ public class LogementServiceImpl implements LogementService {
             headers.set("Accept", "application/json");
             headers.add("Authorization", "Bearer " + tokenArray[1]);
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            String urlUtilisateur = "http://localhost:9002/Utilisateur/"+ idUtilisateur;
+            String urlUtilisateur = "http://localhost:9000/api/utilisateur/"+ idUtilisateur;
             UtilisateurDto restUtilisateurDto = restTemplate.exchange(urlUtilisateur, HttpMethod.GET, entity, UtilisateurDto.class).getBody();
 
             LogementDto logementDto = new LogementDto(

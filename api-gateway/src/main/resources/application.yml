@@ -35,7 +35,7 @@ spring:
           predicates:
             - Path=/api/logement/**
           filters:
-            - RewritePath=/api/logement(?<segment>/?.*), /api/logement$\{segment}
+            - RewritePath=/api/logement(?<segment>/?.*), /logement$\{segment}
             - PreserveHostHeader
         - id: rewritepath_route_review_service
           uri: lb://rbnb-review-service
