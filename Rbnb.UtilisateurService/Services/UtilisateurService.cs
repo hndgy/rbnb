@@ -21,7 +21,6 @@ public class UtilisateurService : IUtilisateurService
     private const string Mail_Info_RoutingKey = "mailing.info";
 
 
-    
     public IModel _channel;
     public UtilisateurService(IConfiguration config, UserServiceDbContext dbContext)
     {
@@ -74,7 +73,7 @@ public class UtilisateurService : IUtilisateurService
             PublishMail(new MailMessage(){
                 toEmail = dto.Mail,
                 subject = "Binvenue",
-                content = "Bienvenu " +dto.Prenom +", \n"
+                content = "Bienvenu chez Rbnb " +dto.Prenom
             });
             return utilisateur;
         }
@@ -101,17 +100,25 @@ public class UtilisateurService : IUtilisateurService
         return "published";
     }
 
-    public void UpdateUtilisateur(string id,Utilisateur utilisateur)
+    public void UpdateUtilisateur(string id,UtilisateurUpdateDto utilisateur)
     {
-        if(_dbContext.Utilisateurs.Find(id) != null){
-            _dbContext.Utilisateurs.Update(utilisateur);
+        Utilisateur user = _dbContext.Utilisateurs.Find(id);
+        if(user != null){
+            user.Bio = utilisateur.Bio;
+            user.PhotoUrl = utilisateur.PhotoUrl;
+            _dbContext.Utilisateurs.Update(user);
+            if(user.Mail != utilisateur.Mail){
+                System.Console.WriteLine("update mail in keycloak...");
+                var res = _keycloakClient.UpdateMailAsync(id, utilisateur.Mail);
+                user.Mail = utilisateur.Mail;
+            }
             _dbContext.SaveChanges();
-            var message = JsonConvert.SerializeObject( utilisateur);
-            var body = Encoding.UTF8.GetBytes(message);
-            _channel.BasicPublish(exchange: Exchange_Update,
-                                    routingKey: "",
-                                    basicProperties: null,
-                                    body: body);
+
+             PublishMail(new MailMessage(){
+                toEmail = user.Mail,
+                subject = "Votre compte est bien à jour !",
+                content = "Votre compte est bien à jour ! \n Cordialement"
+            });
         }
         else
             throw new UtilisateurNonTrouveException();
