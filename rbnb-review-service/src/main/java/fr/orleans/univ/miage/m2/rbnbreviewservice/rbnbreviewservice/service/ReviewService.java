@@ -15,8 +15,6 @@ public interface ReviewService {
     //create
     ReviewDto createReview(ReviewCreationDto reviewCreationDto);
 
-    NotationDto createNotation(NotationDto notationDto);
-
     //getters
     List<ReviewDto> getAllByLogement(Long idLogement);
 

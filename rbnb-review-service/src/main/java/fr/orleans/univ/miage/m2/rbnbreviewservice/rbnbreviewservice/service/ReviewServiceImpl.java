@@ -50,13 +50,6 @@ public class ReviewServiceImpl implements ReviewService{
         return reviewDto;
     }
 
-    @Override
-    public NotationDto createNotation(NotationDto notationDto) {
-        Notation notation = modelMapper.map(notationDto, Notation.class);
-        notationRepo.save(notation);
-        return modelMapper.map(notation, NotationDto.class);
-    }
-
 
     @Override
     public List<ReviewDto> getAllByLogement(Long idLogement) {

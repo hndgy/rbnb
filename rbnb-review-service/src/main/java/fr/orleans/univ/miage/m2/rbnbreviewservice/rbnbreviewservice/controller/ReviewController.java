@@ -66,13 +66,6 @@ public class ReviewController {
         return ResponseEntity.ok().body(reviewService.getAllByLogement(id));
     }
 
-    @RolesAllowed({"USER"})
-    @PostMapping("/notation")
-    public ResponseEntity<NotationDto> createNotation(@RequestBody NotationDto notationDto){
-        NotationDto notation = reviewService.createNotation(notationDto);
-        return new ResponseEntity<>(notation,HttpStatus.CREATED);
-    }
-
 
 
     @RolesAllowed({"USER"})
