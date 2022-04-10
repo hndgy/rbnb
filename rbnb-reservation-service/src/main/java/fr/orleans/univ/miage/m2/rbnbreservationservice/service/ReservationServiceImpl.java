@@ -7,7 +7,6 @@ import fr.orleans.univ.miage.m2.rbnbreservationservice.entity.Reservation;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.repository.DisponibiliteRepo;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.repository.ReservationRepo;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.*;
-import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -143,7 +142,7 @@ public class ReservationServiceImpl implements ReservationService {
             dateDebutDispo = dispo.getDateDebut();
             dateFinDispo = dispo.getDateFin();
             if (dateDebutDispo == null || dateFinDispo == null) {
-                throw new NullPointerException();
+                throw new LogementsIndisponibleException();
             }
 
             if ( ((dateDebutReservation.after(dateDebutDispo))||dateDebutReservation.equals(dateDebutDispo)) && ((dateFinReservation.before(dateFinDispo))||dateFinReservation.equals(dateFinDispo)) ) {
@@ -250,7 +249,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Collection<Disponibilite> setDisponibilite(Long idLogement, List<DisponibiliteDTO> disponibilitesDTO, String token, Principal principal) throws LogementIntrouvableException, UtilisateurInexistantException {
+    public Collection<Disponibilite> setDisponibilite(Long idLogement, List<DisponibiliteDTO> disponibilitesDTO, String token, Principal principal) throws LogementIntrouvableException, UtilisateurInexistantException, LogementsDejaDisponibleException {
         if (disponibilitesDTO.isEmpty()){
             throw new NullPointerException();
         }
@@ -268,20 +267,45 @@ public class ReservationServiceImpl implements ReservationService {
 
         LogementDto2 logementDto = logementDto2ResponseEntity.getBody();
 
+        Collection<Disponibilite> disponibilitesLogement = disponibiliteRepo.findAllDispoByIdLogement((idLogement));
+
         Collection<Disponibilite> disponibilites = new ArrayList<>();
 
         if (logementDto!=null) {
                 for (DisponibiliteDTO disponibiliteDTO : disponibilitesDTO
                 ) {
-                    Disponibilite disponibilite = new Disponibilite();
-                    disponibilite.setIdLogement(disponibiliteDTO.getIdLogement());
-                    disponibilite.setDateDebut(disponibiliteDTO.getDateDebut());
-                    disponibilite.setDateFin(disponibiliteDTO.getDateFin());
+                    Date dateDebut = disponibiliteDTO.getDateDebut();
+                    Date datefin = disponibiliteDTO.getDateFin();
 
-                    disponibiliteRepo.save(disponibilite);
-                    disponibilites.add(disponibilite);
+                    for (Disponibilite disponibliteLogement : disponibilitesLogement
+                         ) {
+                        Date dateDebutDispoLogement = disponibliteLogement.getDateDebut();
+                        Date datefinDispoLogement = disponibliteLogement.getDateFin();
 
+                        if (dateDebut.after(dateDebutDispoLogement) && dateDebut.before(datefinDispoLogement)) {
+                            throw new LogementsDejaDisponibleException();
+                        }
+                        if (datefin.after(dateDebutDispoLogement) && datefin.before(datefinDispoLogement)) {
+                            throw new LogementsDejaDisponibleException();
+                        }
+                        if (dateDebut.before(dateDebutDispoLogement) && datefin.before(datefinDispoLogement)) {
+                            throw new LogementsDejaDisponibleException();
+                        }
+                        if (dateDebut.before(dateDebutDispoLogement) && datefin.after(datefinDispoLogement)) {
+                            throw new LogementsDejaDisponibleException();
+                        }
+                        if (dateDebut.equals(dateDebutDispoLogement) && datefin.equals(datefinDispoLogement)) {
+                            throw new LogementsDejaDisponibleException();
+                        }
 
+                        Disponibilite disponibilite = new Disponibilite();
+                        disponibilite.setIdLogement(idLogement);
+                        disponibilite.setDateDebut(dateDebut);
+                        disponibilite.setDateFin(datefin);
+
+                        disponibiliteRepo.save(disponibilite);
+                        disponibilites.add(disponibilite);
+                    }
                 }
 
             return disponibilites;

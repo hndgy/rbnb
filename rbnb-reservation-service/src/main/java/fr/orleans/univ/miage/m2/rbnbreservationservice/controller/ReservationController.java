@@ -120,10 +120,21 @@ public class ReservationController {
             return ResponseEntity.ok().body(reservationService.setDisponibilite(idLogement,disponibilitesDTO,token, principal));
         } catch (LogementIntrouvableException | UtilisateurInexistantException e) {
             return ResponseEntity.notFound().build();
+        } catch (LogementsDejaDisponibleException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 
-
+    @RolesAllowed("USER")
+    @DeleteMapping("/user/reservation/{idReservation}")
+    public ResponseEntity<Object> deleteReservationByIdReservation(@PathVariable String idReservation) {
+        try {
+            reservationService.annulerReservation(idReservation);
+            return ResponseEntity.ok().build();
+        } catch (ReservationIntrouvableException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 /*
     @RolesAllowed("HOTE")

@@ -10,6 +10,4 @@ public class DisponibiliteDTO {
 
     private Date dateFin;
 
-    private Long idLogement;
-
 }
