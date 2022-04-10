@@ -14,5 +14,7 @@ public interface LogementRepository extends JpaRepository<Logement, Long> {
 
     List<Logement> findLogementsByAddress(String address);
     List<Logement> findLogementsByCity(String city);
+    List<Logement> findLogementsByCityAndNbVoyageursGreaterThanEqual(String city, int nbVoyageurs);
+    List<Logement> findLogementsByNbVoyageursGreaterThanEqual(int nbVoyageurs);
 
 }

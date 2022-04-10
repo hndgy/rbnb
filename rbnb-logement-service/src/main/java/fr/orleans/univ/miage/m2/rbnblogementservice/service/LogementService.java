@@ -27,6 +27,8 @@ public interface LogementService {
 
     List<Logement> findAllLogementByCity(String city) throws LogementNotFoundException;
 
+    List<Logement> findLogementsByCityAndNbVoyageurs(String city, int nbVoyageurs) throws LogementNotFoundException;
+
     List<Logement> getAllLogements();
 
     void deleteLogement(Long id) throws LogementNotFoundException;

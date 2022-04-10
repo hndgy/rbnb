@@ -1,7 +1,6 @@
 package fr.orleans.univ.miage.m2.rbnblogementservice.service;
 
 import fr.orleans.univ.miage.m2.rbnblogementservice.dto.LogementDto;
-import fr.orleans.univ.miage.m2.rbnblogementservice.dto.ProprietaireDto;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Categorie;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Equipement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Logement;
@@ -9,9 +8,6 @@ import fr.orleans.univ.miage.m2.rbnblogementservice.exception.LogementNotFoundEx
 import fr.orleans.univ.miage.m2.rbnblogementservice.repository.CategorieRepository;
 import fr.orleans.univ.miage.m2.rbnblogementservice.repository.EquipementRepository;
 import fr.orleans.univ.miage.m2.rbnblogementservice.repository.LogementRepository;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -177,6 +173,21 @@ public class LogementServiceImpl implements LogementService {
     @Override
     public List<Logement> findAllLogementByCity(String city) throws LogementNotFoundException {
         List<Logement> logements = logementRepository.findLogementsByCity(city);
+        if (logements.isEmpty()) {
+            throw new LogementNotFoundException("Logements introuvables pour la ville : " + city);
+        }
+        else return logements;
+    }
+
+    @Override
+    public List<Logement> findLogementsByCityAndNbVoyageurs(String city, int nbVoyageurs) throws LogementNotFoundException {
+        List<Logement> logements;
+        if (nbVoyageurs != 0) {
+            logements = logementRepository.findLogementsByCityAndNbVoyageursGreaterThanEqual(city, nbVoyageurs);
+        }
+        else {
+            logements = logementRepository.findLogementsByCity(city);
+        }
         if (logements.isEmpty()) {
             throw new LogementNotFoundException("Logements introuvables pour la ville : " + city);
         }

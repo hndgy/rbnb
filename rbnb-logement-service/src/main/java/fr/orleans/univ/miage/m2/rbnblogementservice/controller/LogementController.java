@@ -48,10 +48,14 @@ public class LogementController {
 
     @RolesAllowed({"ADMIN","USER"})
     @GetMapping("/search")
-    public ResponseEntity<List<Logement>> getAllLogementByCity(@RequestParam(defaultValue = "paris") String city) throws LogementNotFoundException {
+    public ResponseEntity<List<Logement>> getAllLogementByCityAndNbVoyageurs(
+            @RequestParam(defaultValue = "paris") String city,
+            @RequestParam(defaultValue = "1") int voyageurs) throws LogementNotFoundException
+    {
         List<Logement> logementList = null;
         try {
-            logementList = logementService.findAllLogementByCity(city.toLowerCase());
+//            logementList = logementService.findAllLogementByCity(city.toLowerCase());
+            logementList = logementService.findLogementsByCityAndNbVoyageurs(city.toLowerCase(), voyageurs);
             template.convertAndSend(MQConfig.LOGEMENT_EXCHANGE, MQConfig.LOGEMENT_ROUTING_KEY, logementList);
             return new ResponseEntity<>(logementList, new HttpHeaders(), HttpStatus.OK);
         } catch (LogementNotFoundException e) {
