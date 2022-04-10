@@ -9,8 +9,9 @@ import java.util.Set;
 public class LogementDto2 {
     private String libelle;
     private String address;
+    private String city;
     private int nbVoyageurs;
-    private String utilisateurDto;
+    private String proprietaire;
     private Set<Image> images;
     private List<Equipement> equipements;
     private List<Categorie> categories;

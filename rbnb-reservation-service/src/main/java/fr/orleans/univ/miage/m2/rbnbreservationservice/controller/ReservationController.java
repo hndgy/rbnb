@@ -77,7 +77,7 @@ public class ReservationController {
     }
 
     @RolesAllowed("USER")
-    @PostMapping("/reservation/{id}")
+    @GetMapping("/reservation/{id}")
     public ResponseEntity<Object> getReservationById(@PathVariable(name = "id") String id) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(reservationService.getReservationsByIdReservation(id));

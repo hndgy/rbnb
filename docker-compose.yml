@@ -33,7 +33,7 @@ services:
       - discovery
       - utilisateur-service
       - logement-service
-      - reservation-service
+#      - reservation-service
       - review-service
 
   mailing-service:
@@ -141,30 +141,30 @@ services:
     ports:
       - "3308:3306"
 
-  reservation-service:
-    build:
-      context: ./rbnb-reservation-service
-    ports:
-      - "9004:9004"
-    environment:
-      - JAVA_TOOL_OPTIONS=
-        -DCONSUL_HOST=discovery
-        -DCONSUL_HOSTNAME=reservation-service
-        -DCONSUL_PORT=8500
-
-        -DKEYCLOAK_SERVER_URL=https://rbnb-keycloak.azurewebsites.net/auth
-        -DKEYCLOAK_REALM=rbnb
-        -DKEYCLOAK_CLIENT=rbnb-client
-
-        -DMONGO_HOST=mongo-reservation-service
-        -DMONGO_PORT=27017
-        -DMONGO_DB=rbnb-reservation
-        -DMONGO_USER=root
-        -DMONGO_PW=p
-    depends_on:
-      - discovery
-      - mongo-reservation-service
-      - rabbitmq
+#  reservation-service:
+#    build:
+#      context: ./rbnb-reservation-service
+#    ports:
+#      - "9004:9004"
+#    environment:
+#      - JAVA_TOOL_OPTIONS=
+#        -DCONSUL_HOST=discovery
+#        -DCONSUL_HOSTNAME=reservation-service
+#        -DCONSUL_PORT=8500
+#
+#        -DKEYCLOAK_SERVER_URL=https://rbnb-keycloak.azurewebsites.net/auth
+#        -DKEYCLOAK_REALM=rbnb
+#        -DKEYCLOAK_CLIENT=rbnb-client
+#
+#        -DMONGO_HOST=mongo-reservation-service
+#        -DMONGO_PORT=27017
+#        -DMONGO_DB=rbnb-reservation
+#        -DMONGO_USER=root
+#        -DMONGO_PW=p
+#    depends_on:
+#      - discovery
+#      - mongo-reservation-service
+#      - rabbitmq
 
 
   mongo-reservation-service:
