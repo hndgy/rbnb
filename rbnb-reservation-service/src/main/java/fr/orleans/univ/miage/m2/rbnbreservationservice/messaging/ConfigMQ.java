@@ -1,5 +1,6 @@
 package fr.orleans.univ.miage.m2.rbnbreservationservice.messaging;
 
+/*
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -11,12 +12,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ConfigMQ {
 
-    public static final String REVIEW = "review";
+    public static final String RESERVATION = "reservation";
     public static final String RBNB_UTILISATEURS_REMOVE = "rbnb_utilisateurs_remove";
 
     @Bean
     public Queue userRemoveQueue(){
-            return new Queue(REVIEW);
+            return new Queue(RESERVATION);
         }
 
     @Bean
@@ -43,4 +44,6 @@ public class ConfigMQ {
     }
 
 }
+
+ */
 

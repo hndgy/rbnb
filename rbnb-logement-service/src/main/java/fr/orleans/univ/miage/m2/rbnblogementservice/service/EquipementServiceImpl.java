@@ -1,6 +1,5 @@
 package fr.orleans.univ.miage.m2.rbnblogementservice.service;
 
-import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Categorie;
 import fr.orleans.univ.miage.m2.rbnblogementservice.entity.Equipement;
 import fr.orleans.univ.miage.m2.rbnblogementservice.repository.EquipementRepository;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ public class EquipementServiceImpl implements EquipementService {
         this.equipementRepository = equipementRepository;
     }
 
+    @Override
     public Equipement createEquipement(Equipement equipement) {
         return equipementRepository.save(equipement);
     }

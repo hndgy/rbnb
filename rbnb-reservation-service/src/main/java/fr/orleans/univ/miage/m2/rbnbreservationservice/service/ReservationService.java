@@ -2,7 +2,6 @@ package fr.orleans.univ.miage.m2.rbnbreservationservice.service;
 
 import fr.orleans.univ.miage.m2.rbnbreservationservice.dto.DisponibiliteDTO;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.dto.Logement;
-import fr.orleans.univ.miage.m2.rbnbreservationservice.dto.LogementDTO;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.dto.ReservationDTO;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.entity.Disponibilite;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.entity.Reservation;
@@ -38,10 +37,3 @@ public interface ReservationService {
 
     void deleteReservationClientWhenLogementDeleted(Long idLogement) throws ReservationIntrouvableException;
 }
-/*
-TODO : Delete dispo et reservation quand client est delete,
-                                   quand hote est delete,
-                                   quand hote annule une reservation,
-                                   quand client annule une reservation,
-                                   hote supprime un logement
- */

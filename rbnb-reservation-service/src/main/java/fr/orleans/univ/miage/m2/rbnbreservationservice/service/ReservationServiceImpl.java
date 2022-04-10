@@ -27,12 +27,14 @@ public class ReservationServiceImpl implements ReservationService {
     private final RestTemplate restTemplate;
     private final DiscoveryClient discoveryClient;
 
+
     public ReservationServiceImpl(ReservationRepo reservationRepo, DisponibiliteRepo disponibiliteRepo, RestTemplate restTemplate, DiscoveryClient discoveryClient) {
         this.reservationRepo = reservationRepo;
         this.disponibiliteRepo = disponibiliteRepo;
         this.restTemplate = restTemplate;
         this.discoveryClient = discoveryClient;
     }
+
 
     @Override //TODO : revoir les DTO ?
     public HashMap<Logement, Collection<Reservation>> getReservationsByHote(String idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException {
@@ -102,9 +104,8 @@ public class ReservationServiceImpl implements ReservationService {
 
         String urlLogement = "http://localhost:9003/logement/"+ reservationDTO.getIdLogement();
         ResponseEntity<LogementDto2> logementDTOResponseEntity = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto2.class);
-        //LogementDTO logementDto = restTemplate.getForObject(urlLogement, LogementDTO.class);
+
         LogementDto2 logementDTO = logementDTOResponseEntity.getBody();
-        //TODO : reverifier les dto
 
         if (logementDTO==null){
             throw new LogementIntrouvableException();
@@ -166,7 +167,7 @@ public class ReservationServiceImpl implements ReservationService {
         throw new LogementsIndisponibleException();
     }
 
-//TODO : faire une classe mapper ?
+
     @Override
     public void updateNbVoyageursReservation(String idReservation, int nbVoyageurs, String token) throws NbVoyagageurIncorrecteException, ReservationIntrouvableException, CapaciteLogementDepasseException, LogementIntrouvableException {
         Optional<Reservation> reservation;
@@ -182,7 +183,6 @@ public class ReservationServiceImpl implements ReservationService {
             String urlLogement = "http://localhost:9003/logement/"+ reservation.get().getIdLogement();
 
             ResponseEntity<LogementDto2> logementDTOResponseEntity =  restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto2.class);
-            //LogementDTO logementDto = restTemplate.getForObject(urlLogement, LogementDTO.class);
 
             LogementDto2 logementDto = logementDTOResponseEntity.getBody();
 
@@ -263,7 +263,6 @@ public class ReservationServiceImpl implements ReservationService {
         String urlLogement = "http://localhost:9003/logement/"+ idLogement;
 
         ResponseEntity<LogementDto2> logementDto2ResponseEntity = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto2.class);
-        //LogementDto2 logementDto = restTemplate.getForObject(urlLogement, LogementDto2.class);
 
         LogementDto2 logementDto = logementDto2ResponseEntity.getBody();
 
@@ -313,6 +312,9 @@ public class ReservationServiceImpl implements ReservationService {
         throw new LogementIntrouvableException();
     }
 
+
+    // Méthode suivante pour delete en recevant un event RabbitMQ + Notifier via un mail à la fin ?
+
     @Override
     public void deleteDispoEtReservationWhenHostDeleted(String idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException {
         HashMap<Logement, Collection<Reservation>> reservationsMap =  this.getReservationsByHote(idHote,token);
@@ -324,7 +326,6 @@ public class ReservationServiceImpl implements ReservationService {
             for (Reservation reservation : reservationCollection
                  ) {
                 this.annulerReservation(reservation.getId());
-                //TODO : RabbitMq notifier le client de l'annulation de la reservation
             }
         }
     }
@@ -335,7 +336,6 @@ public class ReservationServiceImpl implements ReservationService {
         for (Reservation reservation : reservations
              ) {
             this.annulerReservation(reservation.getId());
-            //TODO: RabbitMq notifier l'hote de l'annulation de la reservation
         }
     }
 
@@ -346,14 +346,12 @@ public class ReservationServiceImpl implements ReservationService {
         for (Reservation reservation : reservations
              ) {
              this.annulerReservation(reservation.getId());
-             //TODO: RabbitMq notifier l'hote de l'annulation de la reservation
         }
     }
 
     @Override
     public void deleteReservationClientByHote(String idReservation) throws ReservationIntrouvableException {
         this.annulerReservation(idReservation);
-        //TODO: RabbitMq notifier le client de l'annulation de sa reservation
     }
 
     @Override
@@ -363,7 +361,6 @@ public class ReservationServiceImpl implements ReservationService {
         for (Reservation reservation : reservations
              ) {
             this.annulerReservation(reservation.getId());
-            //TODO: RabbitMq notifier le client de l'annulation de la reservation
         }
     }
 }
