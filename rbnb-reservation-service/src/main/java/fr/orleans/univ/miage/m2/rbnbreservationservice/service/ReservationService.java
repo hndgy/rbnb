@@ -16,9 +16,9 @@ import java.util.List;
 
 
 public interface ReservationService {
-    HashMap<Logement, Collection<Reservation>> getReservationsByHote(Long idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException;
+    HashMap<Logement, Collection<Reservation>> getReservationsByHote(String idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException;
 
-    Collection<Reservation> getReservationsByVoyageur(Long idVoyageur) throws ReservationIntrouvableException;
+    Collection<Reservation> getReservationsByVoyageur(String idVoyageur) throws ReservationIntrouvableException;
     Reservation createReservation(ReservationDTO reservation, Principal principal, String token) throws LogementsIndisponibleException, CapaciteLogementDepasseException, LogementIntrouvableException, UtilisateurInexistantException;
     void updateNbVoyageursReservation(String idRerservation, int nbVoyageurs, String token) throws NbVoyagageurIncorrecteException, ReservationIntrouvableException, CapaciteLogementDepasseException, LogementIntrouvableException;
     void updateDateReservation(String idReservation, Date dateDebut, Date dateFin, Principal principal, String token) throws LogementsIndisponibleException, ReservationIntrouvableException, CapaciteLogementDepasseException, LogementIntrouvableException, UtilisateurInexistantException;
@@ -28,11 +28,11 @@ public interface ReservationService {
 
     Collection<Disponibilite> setDisponibilite(Long idLogement, List<DisponibiliteDTO> disponibilitesDTO, String token, Principal principal) throws LogementIntrouvableException, UtilisateurInexistantException;
 
-    void deleteDispoEtReservationWhenHostDeleted(Long idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException;
+    void deleteDispoEtReservationWhenHostDeleted(String idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException;
 
-    void deleteDispoEtReservationWhenClientDeleted(Long idHote) throws ReservationIntrouvableException;
+    void deleteDispoEtReservationWhenClientDeleted(String idHote) throws ReservationIntrouvableException;
 
-    void deleteReservationClientByClient(Long idClient) throws ReservationIntrouvableException;
+    void deleteReservationClientByClient(String idClient) throws ReservationIntrouvableException;
 
     void deleteReservationClientByHote(String idReservation) throws ReservationIntrouvableException;
 

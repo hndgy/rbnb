@@ -32,7 +32,7 @@ public class Reservation {
     private int nbVoyageurs;
 
     @Field(name = "id_client")
-    private Long idClient;
+    private String idClient;
 
     @Field(name = "id_logement")
     private Long idLogement;

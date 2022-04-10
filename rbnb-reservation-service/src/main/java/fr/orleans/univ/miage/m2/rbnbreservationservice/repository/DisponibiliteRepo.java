@@ -14,7 +14,7 @@ public interface DisponibiliteRepo extends MongoRepository<Disponibilite, String
 //    Disponibilite findByIdLogement(Long idLogement);
 
    Collection<Disponibilite> findAllDispoById(Long idLogement);
-
+   Collection<Disponibilite> findAllDispoByIdLogement(Long idLogement);
 
     Disponibilite findByDateDebutAndIdLogement(Date dateDebut, Long idLogement);
 

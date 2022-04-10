@@ -164,6 +164,8 @@ services:
     depends_on:
       - discovery
       - mongo-reservation-service
+      - rabbitmq
+
 
   mongo-reservation-service:
     image: mongo

@@ -7,6 +7,8 @@ import fr.orleans.univ.miage.m2.rbnbreservationservice.entity.Reservation;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.repository.DisponibiliteRepo;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.repository.ReservationRepo;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.*;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,15 +26,17 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepo reservationRepo;
     private final DisponibiliteRepo disponibiliteRepo;
     private final RestTemplate restTemplate;
+    private final DiscoveryClient discoveryClient;
 
-    public ReservationServiceImpl(ReservationRepo reservationRepo, DisponibiliteRepo disponibiliteRepo, RestTemplate restTemplate) {
+    public ReservationServiceImpl(ReservationRepo reservationRepo, DisponibiliteRepo disponibiliteRepo, RestTemplate restTemplate, DiscoveryClient discoveryClient) {
         this.reservationRepo = reservationRepo;
         this.disponibiliteRepo = disponibiliteRepo;
         this.restTemplate = restTemplate;
+        this.discoveryClient = discoveryClient;
     }
 
     @Override //TODO : revoir les DTO ?
-    public HashMap<Logement, Collection<Reservation>> getReservationsByHote(Long idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException {
+    public HashMap<Logement, Collection<Reservation>> getReservationsByHote(String idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException {
         HttpHeaders headers = new HttpHeaders();
         String[] tokenArray = token.split(" ");
         headers.set("Accept", "application/json");
@@ -73,7 +77,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Collection<Reservation> getReservationsByVoyageur(Long idVoyageur) throws ReservationIntrouvableException {
+    public Collection<Reservation> getReservationsByVoyageur(String idVoyageur) throws ReservationIntrouvableException {
         Collection<Reservation> reservations = reservationRepo.findAllReservationsByIdClient(idVoyageur);
         if (!reservations.isEmpty()) {
             return reservations;
@@ -93,6 +97,9 @@ public class ReservationServiceImpl implements ReservationService {
         headers.set("Accept", "application/json");
         headers.add("Authorization", "Bearer " + tokenArray[1]);
         HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        //List<ServiceInstance> logementServiceList = discoveryClient.getInstances("name-service1");
+        //String urlLogements = logementServiceList.get(0).getUri().resolve("/logement/"+reservationDTO.getIdLogement()).toString();
 
         String urlLogement = "http://localhost:9003/logement/"+ reservationDTO.getIdLogement();
         ResponseEntity<LogementDto2> logementDTOResponseEntity = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto2.class);
@@ -120,9 +127,9 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setIdLogement(reservationDTO.getIdLogement());
         reservation.setDateDebut(reservationDTO.getDateDebut());
         reservation.setDateFin(reservationDTO.getDateFin());
-        reservation.setIdClient(Long.valueOf(principal.getName()));
+        reservation.setIdClient(principal.getName());
 
-        Collection<Disponibilite> disponibilites = disponibiliteRepo.findAllDispoById((reservation.getIdLogement()));
+        Collection<Disponibilite> disponibilites = disponibiliteRepo.findAllDispoByIdLogement((reservation.getIdLogement()));
 
        if (disponibilites.isEmpty()){
           throw new LogementsIndisponibleException();
@@ -198,10 +205,10 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setDateDebut(dateDebut);
 
         ReservationDTO reservationDTO = new ReservationDTO();
-        reservationDTO.setNbVoyageurs(reservationDTO.getNbVoyageurs());
-        reservationDTO.setIdLogement(reservationDTO.getIdLogement());
-        reservationDTO.setDateDebut(reservationDTO.getDateDebut());
-        reservationDTO.setDateFin(reservationDTO.getDateFin());
+        reservationDTO.setNbVoyageurs(reservation.getNbVoyageurs());
+        reservationDTO.setIdLogement(reservation.getIdLogement());
+        reservationDTO.setDateDebut(reservation.getDateDebut());
+        reservationDTO.setDateFin(reservation.getDateFin());
 
         this.annulerReservation(idReservation);
 
@@ -261,26 +268,26 @@ public class ReservationServiceImpl implements ReservationService {
         Collection<Disponibilite> disponibilites = new ArrayList<>();
 
         if (logementDto!=null) {
-            if (principal.getName().equals(logementDto.getUtilisateurDto())) {
                 for (DisponibiliteDTO disponibiliteDTO : disponibilitesDTO
                 ) {
                     Disponibilite disponibilite = new Disponibilite();
                     disponibilite.setIdLogement(disponibiliteDTO.getIdLogement());
                     disponibilite.setDateDebut(disponibiliteDTO.getDateDebut());
                     disponibilite.setDateFin(disponibiliteDTO.getDateFin());
+
+                    disponibiliteRepo.save(disponibilite);
                     disponibilites.add(disponibilite);
+
+
                 }
-            }
-            else {
-                throw new UtilisateurInexistantException();
-            }
+
             return disponibilites;
         }
         throw new LogementIntrouvableException();
     }
 
     @Override
-    public void deleteDispoEtReservationWhenHostDeleted(Long idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException {
+    public void deleteDispoEtReservationWhenHostDeleted(String idHote, String token) throws ReservationIntrouvableException, LogementIntrouvableException {
         HashMap<Logement, Collection<Reservation>> reservationsMap =  this.getReservationsByHote(idHote,token);
 
         Collection<Collection<Reservation>> reservations1 = reservationsMap.values();
@@ -296,7 +303,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void deleteDispoEtReservationWhenClientDeleted(Long idClient) throws ReservationIntrouvableException {
+    public void deleteDispoEtReservationWhenClientDeleted(String idClient) throws ReservationIntrouvableException {
         Collection<Reservation> reservations = this.getReservationsByVoyageur(idClient);
         for (Reservation reservation : reservations
              ) {
@@ -306,7 +313,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void deleteReservationClientByClient(Long idClient) throws ReservationIntrouvableException {
+    public void deleteReservationClientByClient(String idClient) throws ReservationIntrouvableException {
        Collection<Reservation> reservations = reservationRepo.findAllReservationsByIdClient(idClient);
 
         for (Reservation reservation : reservations

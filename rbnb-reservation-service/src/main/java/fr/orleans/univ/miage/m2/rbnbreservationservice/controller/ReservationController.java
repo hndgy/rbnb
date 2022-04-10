@@ -2,6 +2,7 @@ package fr.orleans.univ.miage.m2.rbnbreservationservice.controller;
 
 import fr.orleans.univ.miage.m2.rbnbreservationservice.dto.DisponibiliteDTO;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.dto.ReservationDTO;
+import fr.orleans.univ.miage.m2.rbnbreservationservice.dto.UpdateDateDTO;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.entity.Reservation;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.ReservationService;
 import fr.orleans.univ.miage.m2.rbnbreservationservice.service.exceptions.*;
@@ -44,7 +45,7 @@ public class ReservationController {
 
     @RolesAllowed("USER")
     @GetMapping("/{id}/reservation")
-    public ResponseEntity<Object> getReservationsByVoyageur(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<Object> getReservationsByVoyageur(@PathVariable(name = "id") String id) {
         try {
             return ResponseEntity.ok().body(reservationService.getReservationsByVoyageur(id));
         } catch (ReservationIntrouvableException e) {
@@ -54,7 +55,7 @@ public class ReservationController {
 
     @RolesAllowed("USER")
     @GetMapping("/{id}/reservations")
-    public ResponseEntity<Object> getReservationsByHote(@PathVariable(name = "id") Long id, @RequestHeader(name = "Authorization")String token) {
+    public ResponseEntity<Object> getReservationsByHote(@PathVariable(name = "id") String id, @RequestHeader(name = "Authorization")String token) {
         try {
             return ResponseEntity.ok().body(reservationService.getReservationsByHote(id, token));
         } catch (ReservationIntrouvableException | LogementIntrouvableException e) {
@@ -100,9 +101,9 @@ public class ReservationController {
 
     @RolesAllowed("USER")
     @PutMapping("/reservation/{idReservation}/date")
-    public ResponseEntity<Object> updateDateReservation(@PathVariable String idReservation, @RequestBody Date dateDebut, @RequestBody Date dateFin, Principal principal, @RequestHeader(name = "Authorization")String token) {
+    public ResponseEntity<Object> updateDateReservation(@PathVariable String idReservation, @RequestBody UpdateDateDTO dates, Principal principal, @RequestHeader(name = "Authorization")String token) {
         try {
-            reservationService.updateDateReservation(idReservation, dateDebut, dateFin, principal,token);
+            reservationService.updateDateReservation(idReservation, dates.getDateDebut(), dates.getDateFin(), principal,token);
             return ResponseEntity.ok().body(reservationService.getReservationsByIdReservation(idReservation));
         } catch (LogementsIndisponibleException | CapaciteLogementDepasseException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
