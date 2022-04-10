@@ -142,6 +142,9 @@ public class ReservationServiceImpl implements ReservationService {
              ) {
             dateDebutDispo = dispo.getDateDebut();
             dateFinDispo = dispo.getDateFin();
+            if (dateDebutDispo == null || dateFinDispo == null) {
+                throw new NullPointerException();
+            }
 
             if ( ((dateDebutReservation.after(dateDebutDispo))||dateDebutReservation.equals(dateDebutDispo)) && ((dateFinReservation.before(dateFinDispo))||dateFinReservation.equals(dateFinDispo)) ) {
                 disponibiliteRepo.deleteById(dispo.getId());
