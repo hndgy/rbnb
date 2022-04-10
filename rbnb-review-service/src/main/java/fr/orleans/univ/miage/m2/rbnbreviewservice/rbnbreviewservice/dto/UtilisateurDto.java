@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class UtilisateurDto {
     private String id;
-    private String email;
+    private String mail;
 }
