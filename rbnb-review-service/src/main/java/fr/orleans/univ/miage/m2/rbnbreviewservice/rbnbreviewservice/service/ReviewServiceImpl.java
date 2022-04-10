@@ -31,20 +31,15 @@ public class ReviewServiceImpl implements ReviewService{
 
     private final RestTemplate restTemplate;
 
-    private final RabbitTemplate template;
-
-    private final DiscoveryClient discoveryClient;
     private final ModelMapper modelMapper;
 
     private final Mapper mapper;
 
-    public ReviewServiceImpl(ReviewRepo reviewRepo, NotationRepo notationRepo, PrestationRepo prestationRepo, RestTemplate restTemplate, RabbitTemplate template, DiscoveryClient discoveryClient, ModelMapper modelMapper, Mapper mapper) {
+    public ReviewServiceImpl(ReviewRepo reviewRepo, NotationRepo notationRepo, PrestationRepo prestationRepo, RestTemplate restTemplate,  ModelMapper modelMapper, Mapper mapper) {
         this.reviewRepo = reviewRepo;
         this.notationRepo = notationRepo;
         this.prestationRepo = prestationRepo;
         this.restTemplate = restTemplate;
-        this.template = template;
-        this.discoveryClient = discoveryClient;
         this.modelMapper = modelMapper;
         this.mapper = mapper;
     }
@@ -52,7 +47,7 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public ReviewDto createReview(ReviewCreationDto reviewCreationDto) {
         Review review = mapper.reviewCreationToReview(reviewCreationDto);
-        Review saved = reviewRepo.save(review);
+        reviewRepo.save(review);
         ReviewDto reviewDto = mapper.reviewToReviewDto(review);
         return reviewDto;
     }
@@ -64,10 +59,6 @@ public class ReviewServiceImpl implements ReviewService{
         return modelMapper.map(notation, NotationDto.class);
     }
 
-    @Override
-    public Prestation createPrestation(Prestation prestation) {
-        return prestationRepo.save(prestation);
-    }
 
     @Override
     public List<ReviewDto> getAllByLogement(Long idLogement) {
@@ -107,11 +98,11 @@ public class ReviewServiceImpl implements ReviewService{
            headers.add("Authorization", "Bearer " + tokenArray[1]);
            HttpEntity<String> entity = new HttpEntity<>(headers);
            String urlUtilisateur = "http://localhost:9002/Utilisateur/"+ returnReview.getIdUtilisateur();
-           //String urlLogement = "http://localhost:9003/logement/"+ returnReview.getIdLogement();
+           String urlLogement = "http://localhost:9003/logement/"+ returnReview.getIdLogement();
            ResponseEntity<UtilisateurDto> restUtilisateurDto = restTemplate.exchange(urlUtilisateur, HttpMethod.GET, entity, UtilisateurDto.class);
-          //ResponseEntity<LogementDto> restLogementDto = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto.class);
+           ResponseEntity<LogementDto> restLogementDto = restTemplate.exchange(urlLogement, HttpMethod.GET, entity, LogementDto.class);
            reviewDto.setUtilisateur(restUtilisateurDto.getBody());
-           //reviewDto.setLogement(restLogementDto.getBody());
+           reviewDto.setLogement(restLogementDto.getBody());
            return reviewDto;
        }else {
            throw new ReviewNotFoundException(id);

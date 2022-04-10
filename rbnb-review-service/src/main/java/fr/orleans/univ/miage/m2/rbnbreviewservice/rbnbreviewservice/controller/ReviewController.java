@@ -23,12 +23,9 @@ public class ReviewController {
 
     private ReviewService reviewService;
 
-    private final RabbitTemplate template;
-    private Object mapper;
 
-    public ReviewController(ReviewService reviewService, RabbitTemplate template) {
+    public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
-        this.template = template;
     }
 
     @RolesAllowed("ADMIN")

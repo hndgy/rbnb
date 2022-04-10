@@ -11,11 +11,9 @@ import org.springframework.stereotype.Component;
 public class Mapper {
 
     private PrestationRepo prestationRepo;
-    private ReviewRepo reviewRepo;
 
-    public Mapper(PrestationRepo prestationRepo, ReviewRepo reviewRepo) {
+    public Mapper(PrestationRepo prestationRepo) {
         this.prestationRepo = prestationRepo;
-        this.reviewRepo = reviewRepo;
     }
 
     public Review reviewCreationToReview(ReviewCreationDto reviewCreationDto){

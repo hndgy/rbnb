@@ -17,8 +17,6 @@ public interface ReviewService {
 
     NotationDto createNotation(NotationDto notationDto);
 
-    Prestation createPrestation(Prestation prestation);
-
     //getters
     List<ReviewDto> getAllByLogement(Long idLogement);
 
@@ -28,9 +26,9 @@ public interface ReviewService {
 
     List<Notation> getAllByIdReview(Long idReview);
 
-    List<Notation> getAllByIdPrestation(Long idPrestation);
-
     List<Prestation> getAllPrestation();
+
+    List<Notation> getAllByIdPrestation(Long idPrestation);
 
     //delete
     void deleteById(Long id) throws ReviewNotFoundException;

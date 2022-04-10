@@ -16,7 +16,7 @@ public class ConfigMQ {
 
     @Bean
     public Queue userRemoveQueue(){
-            return new Queue(REVIEW);
+            return new Queue(REVIEW, false);
         }
 
     @Bean
