@@ -6,7 +6,11 @@ import lombok.Data;
 public class UtilisateurDto {
 
     private String id;
+    private String username;
     private String nom;
     private String prenom;
-//    private String urlPhotoDeProfil;
+    private String mail;
+    private String bio;
+    private String photoUrl;
+
 }
